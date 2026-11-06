@@ -44,7 +44,7 @@ export const dollars = (atoms: bigint): string => {
 
 /** The amount `progress` (0 to 1) of the way between two, easing out. */
 export const tweened = (from: bigint, to: bigint, progress: number): bigint => {
-  const eased = 1 - (1 - progress) ** TWEEN_EASE_POWER;
+  const eased = 1 - (1 - Math.max(0, progress)) ** TWEEN_EASE_POWER;
   const step = BigInt(Math.round(eased * TWEEN_STEPS));
   return from + ((to - from) * step) / BigInt(TWEEN_STEPS);
 };

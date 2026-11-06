@@ -31,6 +31,11 @@ const receipt = (name: string, kind: Receipt["kind"], paid: bigint) =>
   ({ at: 0n, kind, noteId: id(name), paid, txHash: TX as Hex }) as Receipt;
 
 describe("tweened", () => {
+  test("holds at the start when a frame's clock runs early", () => {
+    expect(tweened(0n, FIVE, -0.02)).toBe(0n);
+    expect(tweened(FIVE, 0n, -0.02)).toBe(FIVE);
+  });
+
   test("lands exactly on both ends, in either direction", () => {
     expect(tweened(FIVE, 0n, 0)).toBe(FIVE);
     expect(tweened(FIVE, 0n, 1)).toBe(0n);

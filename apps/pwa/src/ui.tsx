@@ -315,6 +315,7 @@ export const Sheet = ({
           onPointerDown={(event) => {
             event.currentTarget.setPointerCapture(event.pointerId);
             grabbedAt.current = event.clientY;
+            travelled.current = 0;
           }}
           onPointerMove={(event) => {
             if (grabbedAt.current !== null) {

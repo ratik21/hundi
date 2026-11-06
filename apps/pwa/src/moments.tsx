@@ -2,18 +2,18 @@ import { type ReactNode, useEffect } from "react";
 import { Button, Page, Seal } from "./ui";
 
 const LONG_WORD = 8;
-/** The pause opens each buzz pattern, so the phone kicks as the stamp hits the paper. */
+/** The phone kicks as the stamp hits the paper. */
 const STAMP_LANDS_MS = 470;
 
 const TONES = {
   bad: {
-    buzz: [STAMP_LANDS_MS, 60, 50, 60],
+    buzz: [60, 50, 60],
     page: "bg-stamp-bad",
     stamp: "text-stamp-bad",
     thud: "animate-shake",
   },
   ok: {
-    buzz: [STAMP_LANDS_MS, 30],
+    buzz: [30],
     page: "bg-stamp-ok",
     stamp: "text-stamp-ok",
     thud: "animate-thud",
@@ -43,9 +43,14 @@ export const Verdict = ({
   const { buzz, page, stamp, thud } = TONES[tone];
 
   useEffect(() => {
-    if ("vibrate" in navigator) {
-      navigator.vibrate([...buzz]);
+    if (!("vibrate" in navigator)) {
+      return;
     }
+    const timer = setTimeout(
+      () => navigator.vibrate([...buzz]),
+      STAMP_LANDS_MS
+    );
+    return () => clearTimeout(timer);
   }, [buzz]);
 
   return (

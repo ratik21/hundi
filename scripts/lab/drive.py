@@ -164,7 +164,7 @@ def accept(name):
     assert motions("Scan their payment", 800) == [], "a transition ran before the verdict"
     see("Paid")
     verdict("ok")
-    assert js("window.__buzz?.length") == 2, "a paid verdict should buzz once"
+    assert js("window.__buzz?.length") == 1, "a paid verdict should buzz once"
     shot(f"{name}-paid")
     tap("Done")
 
@@ -311,7 +311,7 @@ stub_vibrate()
 tap("Scan their payment")
 see("Refused")
 verdict("seen_before")
-assert js("window.__buzz?.length") == 4, "a refused verdict should buzz twice"
+assert js("window.__buzz?.length") == 3, "a refused verdict should buzz twice"
 still = js("getComputedStyle(document.querySelector('.stamp')).animationName")
 assert still == "none", still
 shot("stall-refused")
