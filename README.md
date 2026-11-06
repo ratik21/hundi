@@ -56,7 +56,7 @@ The app opens on port 5173. The camera works only on `localhost` or HTTPS, so te
 
 The app needs no server of its own, so `bun run build` gives you a static site you can host anywhere.
 
-To try all three parties with no phones, run `bun run lab`. It starts three wallets and the chai shop on a local fork, with hot reload, at `localhost:5191` to `5194`. `bun run lab --ios` opens them in the iOS Simulator. `bun run lab:drive` runs the whole demo through the real screens and saves a screenshot of each step in `.lab/shots`. A simulator has no camera, so lab builds pass QR codes through a local relay. Production builds leave that code out.
+To try all three parties with no phones, run `bun run lab`. It starts three wallets and the chai shop on a local fork, with hot reload, at `localhost:5191` to `5194`. `bun run lab --ios` opens each wallet in its own iOS Simulator. `bun run lab:drive` runs the whole demo through the real screens and saves a screenshot of each step in `.lab/shots`. A simulator has no camera, so lab builds pass QR codes through a local relay. Production builds leave that code out. `bun run lab --ios --testnet` runs the same wallets on the real testnet, one simulator each, and spends test funds from the relayer account.
 
 To deploy your own vault, copy `.env.example` to `.env` and fill it in. Then run the commands below and put the result in `deployments/1874.json`.
 

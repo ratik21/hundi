@@ -32,5 +32,5 @@ export const takeLabQr = async (): Promise<Bytes | null> => {
 };
 
 export const fundLabWallet = async (address: string) => {
-  await post("/fund", { address });
+  await post("/fund", { address, from: location.origin });
 };
