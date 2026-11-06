@@ -9,52 +9,115 @@
     <meta content="#7a3b12" name="theme-color">
     <title>Corner Chai</title>
     <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      font-family: Georgia, serif;
+      font-family: system-ui, sans-serif;
       color: #2d1a0b;
       background: #fbf3e4;
     }
     main {
+      display: grid;
+      gap: 1.25rem;
       max-width: 26rem;
       padding: 1.25rem;
       margin: auto;
     }
+    header {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
     h1 {
       margin: 0;
+      font-family: "Iowan Old Style", Palatino, Georgia, serif;
       font-size: 1.8rem;
+    }
+    h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1rem;
     }
     nav {
       display: flex;
-      gap: 1rem;
-      margin: 0.5rem 0 1rem;
-      font-size: 0.95rem;
+      padding: 0.2rem;
+      background: #f0e2c8;
+      border-radius: 999px;
     }
     nav a {
+      padding: 0.35rem 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 600;
       color: #7a3b12;
+      text-decoration: none;
+      border-radius: 999px;
+    }
+    nav a:target,
+    nav:not(:has(:target)) a:first-child {
+      color: #fff;
+      outline: none;
+      background: #7a3b12;
     }
     .item {
-      padding: 0.75rem 1rem;
-      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: space-between;
+      padding: 0.85rem 1rem;
+      font-weight: 600;
       background: #fff;
-      border-radius: 12px;
+      border-radius: 14px;
     }
     #orders {
-      padding-left: 1.25rem;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+    #orders li {
+      padding: 0.6rem 0;
+      border-top: 1px solid #ecdcc0;
+    }
+    #orders:empty::before {
+      color: #8b6f55;
+      content: "No orders yet.";
+    }
+    @media (min-width: 52rem) {
+      main {
+        grid-template-rows: auto auto 1fr;
+        grid-template-columns: 1fr 24rem;
+        align-items: start;
+        max-width: 56rem;
+        padding-top: 2.5rem;
+      }
+      main > :not(#till) {
+        grid-column: 1;
+      }
+      #till {
+        grid-row: 1 / span 3;
+        grid-column: 2;
+      }
     }
     </style>
   </head>
   <body>
     <main>
-      <h1>Corner Chai</h1>
-      <nav>
-        <a href="#merchant">Till</a>
-        <a href="#customer">Customer</a>
-      </nav>
-      <div class="item">Cutting chai and samosa, 5.00 USDT</div>
+      <header>
+        <h1>Corner Chai</h1>
+        <nav>
+          <a href="#merchant" id="merchant">Till</a>
+          <a href="#customer" id="customer">Customer</a>
+        </nav>
+      </header>
+      <div class="item">
+        <span>Cutting chai and samosa</span>
+        <span>5.00 USDT</span>
+      </div>
       <div id="till"></div>
-      <h2>Paid orders</h2>
-      <ol id="orders"></ol>
+      <section>
+        <h2>Paid orders</h2>
+        <ol id="orders"></ol>
+      </section>
     </main>
     <script src="/src/main.ts" type="module"></script>
   </body>
