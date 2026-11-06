@@ -6,7 +6,9 @@ The rule the design enforces is one signature per slot. Each holder of a note ma
 
 The build runs as units U0 to U9, in order, from repo setup through submission. U3 runs beside U1 and U2.
 
-Submissions close Sat 7 Nov at 09:00 IST. Judging starts at 09:30 IST.
+Submissions close Sat 7 Nov at 09:00 IST.
+
+**Route, decided by Ratik on 6 Nov.** Hundi enters **Partner Prizes Only**. There is no live demo, so partners judge the video, the README and the repo. `docs/ai/VIDEO.md` replaces Appendix F as the demo script. Items below that mention a live session or finalist judging no longer apply.
 
 ## How to read this
 
@@ -289,10 +291,10 @@ Skip this unit if time runs short. Skipping it loses only the Anon-RPC entry, be
 **Depends on.** All units you did not cut.
 
 - [ ] Complete every item in Appendix G. Evidence is each file and link.
-- [ ] Record the video from Appendix F at 2:30 to 2:55. It must stay under the 3-minute CROPS limit and above the 2-minute ETHGlobal minimum.
-- [ ] Choose **Finalist and Partner Prizes**, and pick Whitechain and the Ethereum Foundation.
+- [ ] Record the video from `docs/ai/VIDEO.md` at 2:30 to 2:55. It must stay under the 3-minute CROPS limit and above the 2-minute ETHGlobal minimum.
+- [ ] Choose **Partner Prizes Only**, and pick Whitechain and the Ethereum Foundation.
 - [ ] Open the live URL on a phone that has never loaded it. Evidence is a screenshot.
-- [ ] Rehearse Appendix E's answers aloud. The live session is 4 minutes of demo and 3 minutes of questions.
+- [x] Rehearse Appendix E's answers aloud. Dropped: there is no live session on the Partner Prizes Only route.
 
 ## Cut in this order if you fall behind
 
@@ -601,6 +603,8 @@ Say these plainly.
 | What did you decide, and what did AI do? | Answer from `DECISIONS.md` in your own words |
 
 ## Appendix F. Demo script
+
+Replaced by `docs/ai/VIDEO.md` for the video. This table remains the sequence `scripts/lab/drive.py` tests.
 
 Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bond. The stall has a 10 USDT bond. The supplier has no bond.
 

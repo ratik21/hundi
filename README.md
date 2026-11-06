@@ -37,6 +37,7 @@ Real settlements on chain 1874:
 - [First settlement](https://explorer.testnet.whitechain.io/tx/0x4fa116315edde176eb4c8d5e0a39998f21e8791afb5bb9b2958ba3412e74ebab), 5 USDT out of the vault, signed with WebCrypto P-256 keys.
 - [Through the relayer](https://explorer.testnet.whitechain.io/tx/0x6724decba19824a653c94e8557e3d106fcc4fdf94f18ed9667825cb0c257ac66), from a device holding no gas.
 - [Direct](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8), with the relayer stopped.
+- [A double-spend claim](https://explorer.testnet.whitechain.io/tx/0xc2d1f8fd58de4703724456dbeeae6fb27e0166e7a8974a8d905ce4585a9c8ec7), paid from the cheater's bond. The bond fell from 4 to 2 USDT, and 1 USDT burned. `scripts/story-check.ts` reproduces the whole story.
 
 ## Run it
 
