@@ -1,24 +1,164 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #13261d;
-  --color-muted: #5f6f66;
-  --color-paper: #f6f0e4;
-  --color-card: #fffbf2;
-  --color-sand: #e6dcc8;
-  --color-leaf: #1c6b49;
-  --color-clay: #b23c2a;
-  --color-gold: #b7791f;
+  --color-ink: #1a2133;
+  --color-muted: #5c6270;
+  --color-paper: #f1e9da;
+  --color-card: #fcf8ee;
+  --color-sand: #e0d4bd;
+  --color-indigo: #25316b;
+  --color-leaf: #17694a;
+  --color-clay: #b4321d;
+  --color-gold: #8a5a0c;
+
+  --font-serif:
+    ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, "Noto Serif",
+    Georgia, serif;
+
+  --animate-flood: flood 320ms ease-out both;
+  --animate-lift: lift 260ms ease-out both;
+  --animate-stamp: stamp 300ms 260ms cubic-bezier(0.3, 0.7, 0.3, 1.1) both;
+  --animate-thud: thud 240ms 420ms ease-out both;
+  --animate-shake: shake 360ms 420ms ease-in-out both;
+  --animate-rise: rise 300ms 620ms ease-out both;
+  --animate-sweep: sweep 2200ms ease-in-out infinite alternate;
+  --animate-breathe: breathe 1400ms ease-in-out infinite;
+
+  @keyframes flood {
+    from {
+      clip-path: circle(0% at 50% 42%);
+    }
+    to {
+      clip-path: circle(150% at 50% 42%);
+    }
+  }
+
+  @keyframes lift {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  @keyframes stamp {
+    0% {
+      opacity: 0;
+      transform: scale(2.6) rotate(-16deg);
+    }
+    70% {
+      opacity: 1;
+      transform: scale(0.94) rotate(-6deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(-6deg);
+    }
+  }
+
+  @keyframes thud {
+    40% {
+      transform: translateY(6px) scale(0.985);
+    }
+  }
+
+  @keyframes shake {
+    20%,
+    60% {
+      transform: translateX(-7px);
+    }
+    40%,
+    80% {
+      transform: translateX(7px);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes sweep {
+    from {
+      top: 12%;
+    }
+    to {
+      top: 88%;
+    }
+  }
+
+  @keyframes breathe {
+    50% {
+      opacity: 0.55;
+      transform: scale(0.94);
+    }
+  }
 }
 
 html,
 body {
   background: var(--color-paper);
   color: var(--color-ink);
+  color-scheme: light;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 .tabular {
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* A printed instrument: paper, a hairline frame inset from the edge. */
+.note {
+  position: relative;
+  background: var(--color-card);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 0 0 1px rgb(26 33 51 / 0.1),
+    0 14px 24px -18px rgb(26 33 51 / 0.45);
+}
+
+.note::after {
+  position: absolute;
+  inset: 0.4rem;
+  pointer-events: none;
+  content: "";
+  border: 1px solid var(--color-sand);
+  border-radius: 0.25rem;
+}
+
+.note-blank {
+  outline: 1.5px dashed var(--color-sand);
+  background: transparent;
+  box-shadow: none;
+}
+
+.note-blank::after {
+  display: none;
+}
+
+/* The sheets under the top note, one per extra note in the stack. */
+.note-sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--color-card);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1px rgb(26 33 51 / 0.12);
+}
+
+.stamp {
+  border: 6px double currentcolor;
+  border-radius: 0.5rem;
+  mix-blend-mode: multiply;
+  transform: rotate(-6deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition: none !important;
+    animation: none !important;
+  }
 }

@@ -1,6 +1,57 @@
 import { drawQr } from "@hundi/wallet/qr";
 import { startScan } from "@hundi/wallet/scanner";
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { useOnline } from "./use-wallet";
+
+const PAGE =
+  "mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]";
+
+export const Page = ({ children }: { children: ReactNode }) => (
+  <main className={PAGE}>{children}</main>
+);
+
+export const Seal = ({ className = "size-9" }: { className?: string }) => (
+  <svg aria-hidden="true" className={className} viewBox="0 0 40 40">
+    <circle
+      className="stroke-clay"
+      cx="20"
+      cy="20"
+      fill="none"
+      r="18.5"
+      strokeWidth="2"
+    />
+    <circle
+      className="stroke-clay"
+      cx="20"
+      cy="20"
+      fill="none"
+      r="15.5"
+      strokeWidth="0.75"
+    />
+    <text
+      className="fill-clay"
+      dominantBaseline="central"
+      fontSize="17"
+      fontWeight="700"
+      textAnchor="middle"
+      x="20"
+      y="20"
+    >
+      हुं
+    </text>
+  </svg>
+);
+
+export const Plane = ({ className = "size-5" }: { className?: string }) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" />
+  </svg>
+);
 
 export const Screen = ({
   children,
@@ -10,29 +61,51 @@ export const Screen = ({
   children: ReactNode;
   onBack?: () => void;
   title: string;
-}) => (
-  <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-    <header className="flex items-center gap-3">
-      {onBack && (
-        <button
-          aria-label="Back"
-          className="-ml-2 rounded-full px-2 py-1 text-2xl leading-none"
-          onClick={onBack}
-          type="button"
-        >
-          ←
-        </button>
-      )}
-      <h1 className="text-xl font-semibold">{title}</h1>
-    </header>
-    {children}
-  </main>
-);
+}) => {
+  const online = useOnline();
+  return (
+    <Page>
+      <header className="flex items-center gap-2">
+        {onBack && (
+          <button
+            aria-label="Back"
+            className="-ml-2 rounded-full p-2"
+            onClick={onBack}
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              className="size-6"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+          </button>
+        )}
+        <h1 className="min-w-0 flex-1 font-serif text-[1.4rem] font-semibold">
+          {title}
+        </h1>
+        {!online && (
+          <span className="bg-indigo text-paper flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold">
+            <Plane className="size-4" />
+            Offline
+          </span>
+        )}
+      </header>
+      {children}
+    </Page>
+  );
+};
 
 const BUTTON = {
-  danger: "bg-clay text-white",
-  plain: "border border-sand bg-card text-ink",
-  primary: "bg-leaf text-white",
+  light: "bg-card text-ink",
+  plain: "border border-ink/20 bg-card text-ink",
+  primary: "bg-indigo text-card",
 } as const;
 
 export const Button = ({
@@ -47,7 +120,7 @@ export const Button = ({
   variant?: keyof typeof BUTTON;
 }) => (
   <button
-    className={`w-full rounded-2xl px-4 py-4 text-lg font-semibold transition active:scale-[0.98] disabled:opacity-40 ${BUTTON[variant]}`}
+    className={`w-full rounded-xl px-4 py-4 text-lg font-semibold transition active:scale-[0.98] disabled:opacity-40 ${BUTTON[variant]}`}
     disabled={disabled}
     onClick={onClick}
     type="button"
@@ -57,7 +130,7 @@ export const Button = ({
 );
 
 export const Card = ({ children }: { children: ReactNode }) => (
-  <section className="border-sand bg-card rounded-2xl border p-4">
+  <section className="border-sand bg-card rounded-xl border p-4">
     {children}
   </section>
 );
@@ -75,9 +148,38 @@ export const Notice = ({
     warn: "bg-gold/15 text-gold",
   };
   return (
-    <p className={`rounded-xl px-3 py-2 text-sm ${tones[tone]}`}>{children}</p>
+    <p className={`rounded-lg px-3 py-2 text-sm ${tones[tone]}`}>{children}</p>
   );
 };
+
+/** A paper note, with one sheet showing beneath it per extra note. */
+export const Note = ({
+  blank = false,
+  children,
+  sheets = 0,
+}: {
+  blank?: boolean;
+  children: ReactNode;
+  sheets?: number;
+}) => (
+  <div className="relative" style={{ marginBottom: Math.min(sheets, 2) * 8 }}>
+    {sheets > 1 && (
+      <div
+        aria-hidden="true"
+        className="note-sheet"
+        style={{ transform: "translateY(16px) scale(0.93)" }}
+      />
+    )}
+    {sheets > 0 && (
+      <div
+        aria-hidden="true"
+        className="note-sheet"
+        style={{ transform: "translateY(8px) scale(0.965)" }}
+      />
+    )}
+    <div className={`note p-5 ${blank ? "note-blank" : ""}`}>{children}</div>
+  </div>
+);
 
 export const Stepper = ({
   label,
@@ -148,7 +250,7 @@ export const QrCode = ({ bytes }: { bytes: Uint8Array }) => {
 
   return (
     <div
-      className="flex justify-center rounded-2xl bg-white"
+      className="flex justify-center rounded-xl bg-white shadow-[0_0_0_1px_rgb(26_33_51/0.1)]"
       data-qr
       ref={frame}
     >
@@ -156,6 +258,13 @@ export const QrCode = ({ bytes }: { bytes: Uint8Array }) => {
     </div>
   );
 };
+
+const CORNERS = [
+  "left-6 top-6 border-l-4 border-t-4 rounded-tl-lg",
+  "right-6 top-6 border-r-4 border-t-4 rounded-tr-lg",
+  "bottom-6 left-6 border-b-4 border-l-4 rounded-bl-lg",
+  "bottom-6 right-6 border-b-4 border-r-4 rounded-br-lg",
+];
 
 /** Calls `onBytes` once with the first QR it reads, then stops the camera. */
 export const Camera = ({
@@ -182,11 +291,17 @@ export const Camera = ({
   }, []);
 
   return (
-    <video
-      className="aspect-square w-full rounded-2xl bg-black object-cover"
-      muted
-      playsInline
-      ref={video}
-    />
+    <div className="bg-ink relative aspect-square w-full overflow-hidden rounded-xl">
+      <video className="size-full object-cover" muted playsInline ref={video} />
+      <div aria-hidden="true" className="absolute inset-0">
+        {CORNERS.map((corner) => (
+          <span
+            className={`border-card absolute size-12 ${corner}`}
+            key={corner}
+          />
+        ))}
+        <span className="animate-sweep bg-card/70 absolute inset-x-10 h-0.5 rounded-full" />
+      </div>
+    </div>
   );
 };
