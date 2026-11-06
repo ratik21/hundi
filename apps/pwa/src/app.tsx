@@ -29,14 +29,16 @@ const Screens = () => {
   if (error) {
     return (
       <Failure
-        next="Close Hundi and open it again. Your notes stay on this phone."
+        next="Close Hundi and open it again. Your money stays on this phone."
         title="Could not open"
         what={`This phone could not open its wallet: ${error}`}
       />
     );
   }
   if (!(wallet && view)) {
-    return <Working detail="Your notes live on this phone." title="Opening…" />;
+    return (
+      <Working detail="Your money lives on this phone." title="Opening…" />
+    );
   }
   if (route === "add") {
     return (

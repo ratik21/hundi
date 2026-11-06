@@ -311,7 +311,7 @@ const mount = (wallet: Wallet, root: ShadowRoot, options: HundiOptions) => {
     });
 
   const settle = async (status: HTMLElement) => {
-    status.textContent = "Settling…";
+    status.textContent = "Claiming…";
     try {
       const results = await wallet.settle();
       const paid = results.filter(
@@ -319,8 +319,8 @@ const mount = (wallet: Wallet, root: ShadowRoot, options: HundiOptions) => {
       );
       status.textContent =
         results.length > 0
-          ? `${paid.length} of ${results.length} settled`
-          : "Nothing to settle yet.";
+          ? `${paid.length} of ${results.length} claimed`
+          : "Nothing to claim yet.";
     } catch {
       status.textContent = "Could not reach the network. Try again.";
     }
@@ -340,7 +340,7 @@ const mount = (wallet: Wallet, root: ShadowRoot, options: HundiOptions) => {
       button("Scan their payment", () => takePayment(request)),
       group(
         "row",
-        button("Settle", () => settle(status), "plain"),
+        button("Claim", () => settle(status), "plain"),
         button("Download CSV", exportCsv, "plain")
       ),
       status
@@ -397,14 +397,10 @@ const mount = (wallet: Wallet, root: ShadowRoot, options: HundiOptions) => {
       summary(
         "You can spend",
         BigInt(spendable) * price,
-        element(
-          "p",
-          "detail",
-          `${spendable} ${spendable === 1 ? "note" : "notes"} of ${label}`
-        )
+        element("p", "detail", "Available offline")
       ),
       button("Scan the shop's code", scanShop),
-      button(`Add a ${label} note`, () => addNote(status), "plain"),
+      button(`Add ${label}`, () => addNote(status), "plain"),
       status
     );
   };

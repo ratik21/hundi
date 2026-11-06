@@ -109,7 +109,7 @@ export const AddMoney = ({
   if (busy) {
     return (
       <Working
-        detail="Putting your deposit in place and printing your notes. This takes a few seconds."
+        detail="Putting your money and deposit in place. This takes a few seconds."
         title="Adding your money…"
       />
     );
@@ -124,7 +124,7 @@ export const AddMoney = ({
       )}
       <div className="flex flex-col gap-3">
         <Choice
-          detail={`${SPEND_NOTES} notes of ${NOTE_USDT} USDT, ${
+          detail={`${SPEND_NOTES * NOTE_USDT} USDT to spend, ${
             spending.deposit > 0
               ? `plus ${spending.deposit} USDT deposit`
               : "covered by your deposit"
@@ -136,7 +136,7 @@ export const AddMoney = ({
           why="Pay at shops, even with no signal."
         />
         <Choice
-          detail={`${STALL_DEPOSIT} USDT deposit, no notes`}
+          detail={`${STALL_DEPOSIT} USDT deposit, nothing to spend`}
           onPick={() => setAmounts(stall)}
           picked={is(stall)}
           title="For my stall"
@@ -146,7 +146,7 @@ export const AddMoney = ({
       </div>
       <p className="text-muted text-sm">
         The safety deposit stays yours. It lets strangers trust you with no
-        signal, and you only lose it if you spend a note twice.
+        signal, and you only lose it if you spend the same money twice.
       </p>
       <button
         aria-expanded={adjusting}
@@ -160,7 +160,7 @@ export const AddMoney = ({
         <Card>
           <div className="flex flex-col gap-4">
             <Stepper
-              label="Notes"
+              label="Payments"
               onChange={(next) => setAmounts({ count: next, deposit })}
               step={1}
               suffix={`× ${NOTE_USDT} USDT`}
@@ -178,7 +178,7 @@ export const AddMoney = ({
       )}
       {!covered && (
         <Notice tone="warn">
-          Your deposit must be at least twice your notes. Raise it to{" "}
+          Your deposit must be at least twice what you can spend. Raise it to{" "}
           {formatUsdt(needed - view.deposit)} USDT.
         </Notice>
       )}

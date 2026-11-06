@@ -1,3 +1,5 @@
+import { keyId } from "@hundi/core/bytes";
+import type { Note, PublicKey } from "@hundi/core/types";
 import type { NoteRecord, Receipt } from "@hundi/wallet/store";
 import type { SettleResult } from "@hundi/wallet/wallet";
 import type { Hex } from "viem";
@@ -17,12 +19,20 @@ export type ActivityKind =
 export interface Activity {
   /** Unknown when another device settled the note first. */
   amount?: bigint;
+  /** Milliseconds. Absent on payments made before the app stored it. */
+  at?: number;
   id: string;
   kind: ActivityKind;
+  /** Who it was with, once this phone knows. "From 4f3a…9c21". */
+  party?: string;
   receipt?: Hex;
 }
 
-export type SettleWord = "Already paid" | "Covered" | "Not settled" | "Settled";
+export type SettleWord =
+  | "Already claimed"
+  | "Claimed"
+  | "Covered"
+  | "Not claimed";
 
 export interface SettleSummary {
   amount: bigint;
@@ -47,6 +57,26 @@ export const tweened = (from: bigint, to: bigint, progress: number): bigint => {
   const eased = 1 - (1 - Math.max(0, progress)) ** TWEEN_EASE_POWER;
   const step = BigInt(Math.round(eased * TWEEN_STEPS));
   return from + ((to - from) * step) / BigInt(TWEEN_STEPS);
+};
+
+const KEY_EDGE = 4;
+
+/** A key is long and means nothing to a person, so show its ends. */
+export const shortKey = (key: PublicKey): string => {
+  const hex = keyId(key).slice(2);
+  return `${hex.slice(0, KEY_EDGE)}…${hex.slice(-KEY_EDGE)}`;
+};
+
+/** The holder before this phone: the last hop names us. */
+const senderOf = ({ header, hops }: Note): PublicKey =>
+  hops.at(-2)?.to ?? header.owner;
+
+/** "Today 12:12" for today, "6 Nov" before that. */
+export const whenLabel = (at: number, now: number): string => {
+  const date = new Date(at);
+  return date.toDateString() === new Date(now).toDateString()
+    ? `Today ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    : date.toLocaleDateString([], { day: "numeric", month: "short" });
 };
 
 export const noteGroups = (records: readonly NoteRecord[]): NoteGroup[] => {
@@ -103,15 +133,30 @@ export const activityOf = (
 ): Activity[] => {
   const byNote = new Map(receipts.map((receipt) => [receipt.noteId, receipt]));
   const lines: Activity[] = [];
-  for (const { id, state } of [...records].sort((a, b) => b.order - a.order)) {
+  for (const { at, id, state } of [...records].sort(
+    (a, b) => b.order - a.order
+  )) {
+    const when = at === undefined ? {} : { at };
     if (state.kind === "offered") {
-      lines.push({ amount: state.note.header.face, id, kind: "sent" });
+      lines.push({
+        amount: state.note.header.face,
+        id,
+        kind: "sent",
+        party: `To ${shortKey(state.hop.to)}`,
+        ...when,
+      });
     } else if (state.kind === "held") {
       if (state.note.hops.length > 0) {
-        lines.push({ amount: state.note.header.face, id, kind: "received" });
+        lines.push({
+          amount: state.note.header.face,
+          id,
+          kind: "received",
+          party: `From ${shortKey(senderOf(state.note))}`,
+          ...when,
+        });
       }
     } else {
-      lines.push(closed(id, state, byNote.get(id)));
+      lines.push({ ...closed(id, state, byNote.get(id)), ...when });
     }
   }
   return lines;
@@ -135,7 +180,11 @@ export const settleSummary = (
     return { amount, failed, word: "Covered" };
   }
   if (amount > 0n) {
-    return { amount, failed, word: "Settled" };
+    return { amount, failed, word: "Claimed" };
   }
-  return { amount, failed, word: failed > 0 ? "Not settled" : "Already paid" };
+  return {
+    amount,
+    failed,
+    word: failed > 0 ? "Not claimed" : "Already claimed",
+  };
 };

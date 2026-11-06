@@ -23,6 +23,7 @@ import {
   receivedTotal,
   settleSummary,
   tweened,
+  whenLabel,
 } from "./ledger";
 import { Verdict, Working } from "./moments";
 import { reducedMotion } from "./motion";
@@ -62,49 +63,48 @@ const syncedLabel = (syncedAt: bigint): string => {
     : `Updated ${age / HOUR} h ago`;
 };
 
-const groupLabel = ({ count, face }: NoteGroup): string =>
-  `${count} ${count === 1 ? "note" : "notes"} of ${formatUsdt(face)} USDT`;
-
 const ACTIVITY: Record<
   ActivityKind,
   {
-    detail: string;
+    detail?: string;
     glyph: "check" | "down" | "shield" | "up";
     sign: string;
+    status?: "Confirmed" | "Pending";
     title: string;
     tone: string;
   }
 > = {
   covered: {
-    detail: "Someone spent this note twice. Their deposit paid you.",
+    detail: "Someone spent this money twice. Their deposit paid you.",
     glyph: "shield",
     sign: "+",
+    status: "Confirmed",
     title: "Covered by a deposit",
     tone: "text-good",
   },
   covered_in_part: {
-    detail: "Someone spent this note twice. Their deposit paid part of it.",
+    detail: "Someone spent this money twice. Their deposit paid part of it.",
     glyph: "shield",
     sign: "+",
+    status: "Confirmed",
     title: "Covered in part",
     tone: "text-warn",
   },
   paid_out: {
-    detail: "This money is yours to keep.",
     glyph: "check",
     sign: "+",
-    title: "Paid out to you",
+    status: "Confirmed",
+    title: "Received",
     tone: "text-good",
   },
   received: {
-    detail: "Spend it on, or settle it for cash.",
     glyph: "down",
     sign: "+",
+    status: "Pending",
     title: "Received",
     tone: "text-fg",
   },
   sent: {
-    detail: "You paid with this note.",
     glyph: "up",
     sign: "−",
     title: "Sent",
@@ -114,7 +114,7 @@ const ACTIVITY: Record<
 
 const FAILURES: Record<string, string> = {
   BondEmpty: "The cheater's deposit has run out. You can try again later.",
-  NoteExpired: "This note's time to settle has passed.",
+  NoteExpired: "The time to claim this has passed.",
 };
 
 const settleLine = (result: SettleResult): string => {
@@ -125,16 +125,16 @@ const settleLine = (result: SettleResult): string => {
     return `Covered ${formatUsdt(result.paid)} USDT`;
   }
   if (result.kind === "already") {
-    return "Already paid";
+    return "Already claimed";
   }
-  return FAILURES[result.reason] ?? "Could not settle. Try again.";
+  return FAILURES[result.reason] ?? "Could not claim this. Try again.";
 };
 
 const SETTLE_LINES = {
-  "Already paid": "These notes were paid out before.",
-  Covered: "Someone spent a note twice. Their deposit paid you.",
-  "Not settled": "Your notes are safe here. Nothing was lost.",
-  Settled: "Paid out to you",
+  "Already claimed": "You already have this money.",
+  Claimed: "Paid out to you",
+  Covered: "Someone spent this money twice. Their deposit paid you.",
+  "Not claimed": "Your money is safe here. Nothing was lost.",
 };
 
 const SettleDone = ({
@@ -150,7 +150,7 @@ const SettleDone = ({
       amount={amount > 0n ? `${formatUsdt(amount)} USDT` : undefined}
       line={SETTLE_LINES[word]}
       onDone={onDone}
-      tone={word === "Not settled" ? "bad" : "ok"}
+      tone={word === "Not claimed" ? "bad" : "ok"}
       verdict={word}
       word={word}
     >
@@ -184,7 +184,7 @@ const OfflineBand = () => (
     <div>
       <p className="font-semibold">Offline. Payments still work.</p>
       <p className="text-muted text-sm">
-        Hundi checks every note right here on this phone.
+        Hundi checks every payment right here on this phone.
       </p>
     </div>
   </section>
@@ -336,21 +336,17 @@ const Tokens = ({
   <ul className="stagger">
     <TokenRow
       amount={`${formatUsdt(groupsTotal(groups))} USDT`}
-      detail={
-        groups.length > 0
-          ? groups.map(groupLabel).join(", ")
-          : "No notes right now"
-      }
+      detail={groups.length > 0 ? "Available offline" : "Nothing to spend yet"}
       icon={<TokenIcon />}
-      title="USDT notes"
+      title="USDT"
     />
     {(deposit > 0n || lost > 0n) && (
       <TokenRow
         amount={`${formatUsdt(deposit)} USDT`}
         detail={
           lost > 0n
-            ? `${formatUsdt(lost)} USDT taken. A note from this phone was spent twice.`
-            : "Still yours. It is why strangers trust your notes."
+            ? `${formatUsdt(lost)} USDT taken. This phone spent the same money twice.`
+            : "Still yours. It is why strangers trust your payments."
         }
         icon={
           <RowIcon tone="text-accent">
@@ -365,24 +361,43 @@ const Tokens = ({
 );
 
 const ActivityRow = ({ line }: { line: Activity }) => {
-  const { detail, glyph, sign, title, tone } = ACTIVITY[line.kind];
+  const { detail, glyph, sign, status, title, tone } = ACTIVITY[line.kind];
+  const facts = [
+    line.party,
+    line.at === undefined ? undefined : whenLabel(line.at, Date.now()),
+  ].filter(Boolean);
   return (
     <li className="flex items-center gap-3 py-3">
       <RowIcon tone={tone}>
         <Glyph name={glyph} />
       </RowIcon>
       <div className="min-w-0 flex-1">
-        <p className="font-semibold">{title}</p>
+        <p className="flex items-center gap-2 font-semibold">
+          {title}
+          {status && (
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                status === "Pending"
+                  ? "bg-warn/15 text-warn"
+                  : "bg-good/15 text-good"
+              }`}
+            >
+              {status}
+            </span>
+          )}
+        </p>
+        {detail && <p className="text-muted text-sm">{detail}</p>}
         <p className="text-muted text-sm">
-          {detail}{" "}
+          {facts.join(" · ")}
+          {facts.length > 0 && line.receipt && " · "}
           {line.receipt && (
             <a
-              className="underline"
+              className="whitespace-nowrap underline"
               href={receiptUrl(line.receipt)}
               rel="noreferrer"
               target="_blank"
             >
-              Receipt
+              View on explorer
             </a>
           )}
         </p>
@@ -511,8 +526,8 @@ export const Home = ({
   if (busy === "settling") {
     return (
       <Working
-        detail="Cashing out your notes. This takes a few seconds."
-        title="Settling…"
+        detail="Getting your money. This takes a few seconds."
+        title="Claiming…"
       />
     );
   }
@@ -602,7 +617,7 @@ export const Home = ({
               disabled={!(online && received > 0n)}
               glyph="check"
               highlight={online && received > 0n}
-              name="Settle"
+              name="Claim"
               onClick={settle}
             />
           </div>
@@ -616,13 +631,11 @@ export const Home = ({
 
       {received > 0n && (
         <Card>
-          <p className="font-semibold">
-            You received {formatUsdt(received)} USDT
-          </p>
+          <p className="font-semibold">{formatUsdt(received)} USDT pending</p>
           <p className="text-muted mt-0.5 text-sm">
             {online
-              ? "Settle to cash it out, or spend it on."
-              : "Settle when you have signal. Your notes are safe here."}
+              ? "Claim it now, or spend it on."
+              : "Claim it when you're online. It's safe on this phone."}
           </p>
         </Card>
       )}

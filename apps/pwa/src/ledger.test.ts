@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Note, NoteId } from "@hundi/core/types";
+import type { Note, NoteId, PublicKey } from "@hundi/core/types";
 import type { NoteRecord, Receipt } from "@hundi/wallet/store";
 import { formatUsdt, type SettleResult } from "@hundi/wallet/wallet";
 import type { Hex } from "viem";
@@ -10,16 +10,31 @@ import {
   noteGroups,
   receivedTotal,
   settleSummary,
+  shortKey,
   tweened,
+  whenLabel,
 } from "./ledger";
 
 const FIVE = 5_000_000n;
+const SHORT_KEY = /^[0-9a-f]{4}…[0-9a-f]{4}$/u;
 const TX = `0x${"ab".repeat(32)}` as const;
 const NO_TX = `0x${"00".repeat(32)}` as const;
 const id = (name: string) => name as NoteId;
 
+const key = (byte: string) =>
+  ({
+    x: `0x${byte.repeat(32)}`,
+    y: `0x${byte.repeat(32)}`,
+  }) as unknown as PublicKey;
+const OWNER = key("11");
+const MIDDLE = key("22");
+const ME = key("33");
+
 const note = (face: bigint, hops = 0) =>
-  ({ header: { face }, hops: Array.from({ length: hops }) }) as unknown as Note;
+  ({
+    header: { face, owner: OWNER },
+    hops: hops === 0 ? [] : [MIDDLE, ME].slice(-hops).map((to) => ({ to })),
+  }) as unknown as Note;
 
 const record = (name: string, order: number, state: unknown) =>
   ({ id: id(name), order, state }) as NoteRecord;
@@ -82,14 +97,38 @@ describe("activityOf", () => {
       [
         held("minted", 1),
         held("received", 2, 1),
-        record("sent", 3, { kind: "offered", note: note(FIVE, 1) }),
+        record("sent", 3, {
+          hop: { to: MIDDLE },
+          kind: "offered",
+          note: note(FIVE, 1),
+        }),
       ],
       []
     );
     expect(lines).toEqual([
-      { amount: FIVE, id: "sent", kind: "sent" },
-      { amount: FIVE, id: "received", kind: "received" },
+      {
+        amount: FIVE,
+        id: "sent",
+        kind: "sent",
+        party: `To ${shortKey(MIDDLE)}`,
+      },
+      {
+        amount: FIVE,
+        id: "received",
+        kind: "received",
+        party: `From ${shortKey(OWNER)}`,
+      },
     ]);
+  });
+
+  test("names the holder before this phone, not the first owner", () => {
+    const [line] = activityOf([held("onward", 1, 2)], []);
+    expect(line?.party).toBe(`From ${shortKey(MIDDLE)}`);
+  });
+
+  test("carries the time a state was written, when it has one", () => {
+    const stamped = { ...held("received", 1, 1), at: 1000 };
+    expect(activityOf([stamped], [])[0]?.at).toBe(1000);
   });
 
   test("uses the receipt for what actually arrived", () => {
@@ -140,13 +179,13 @@ describe("settleSummary", () => {
     expect(settleSummary([paid(FIVE), failed])).toEqual({
       amount: FIVE,
       failed: 1,
-      word: "Settled",
+      word: "Claimed",
     });
   });
 
   test("nothing paid is either a failure or old news", () => {
-    expect(settleSummary([failed]).word).toBe("Not settled");
-    expect(settleSummary([already]).word).toBe("Already paid");
+    expect(settleSummary([failed]).word).toBe("Not claimed");
+    expect(settleSummary([already]).word).toBe("Already claimed");
   });
 });
 
@@ -165,5 +204,26 @@ describe("formatUsdt", () => {
     expect(formatUsdt(100_000n)).toBe("0.10");
     expect(formatUsdt(5_000_000n)).toBe("5");
     expect(formatUsdt(1_234_567n)).toBe("1.234567");
+  });
+});
+
+describe("whenLabel", () => {
+  const noon = new Date(2026, 10, 7, 12, 12).getTime();
+
+  test("gives a time for today", () => {
+    expect(whenLabel(noon, noon + 1000)).toStartWith("Today ");
+  });
+
+  test("gives a date before today", () => {
+    const earlier = new Date(2026, 10, 6, 12, 12).getTime();
+    expect(whenLabel(earlier, noon)).not.toStartWith("Today");
+    expect(whenLabel(earlier, noon)).toContain("6");
+  });
+});
+
+describe("shortKey", () => {
+  test("keeps the two ends of the key's hash", () => {
+    expect(shortKey(OWNER)).toMatch(SHORT_KEY);
+    expect(shortKey(OWNER)).not.toBe(shortKey(MIDDLE));
   });
 });

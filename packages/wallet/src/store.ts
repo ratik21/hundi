@@ -11,6 +11,8 @@ import { MAX_HOPS } from "@hundi/core/types";
 import type { Hex } from "viem";
 
 export interface NoteRecord {
+  /** Milliseconds when this state was written. Absent on older records. */
+  at?: number;
   id: NoteId;
   /** Grows with every write, so the latest offer can be found. */
   order: number;
@@ -106,7 +108,7 @@ export const memoryStore = (): WalletStore => {
     notes: () => Promise.resolve([...notes.values()]),
     putNote: (id, state) => {
       order += 1;
-      notes.set(id, { id, order, state });
+      notes.set(id, { at: Date.now(), id, order, state });
       return Promise.resolve();
     },
     read: <K extends keyof Meta>(key: K) =>
@@ -150,7 +152,9 @@ export const indexedDbStore = async (): Promise<WalletStore> => {
     notes,
     putNote: async (id, state) => {
       const order = Math.max(0, ...(await notes()).map((n) => n.order)) + 1;
-      await done(table(NOTES, "readwrite").put({ id, order, state }));
+      await done(
+        table(NOTES, "readwrite").put({ at: Date.now(), id, order, state })
+      );
     },
     read: <K extends keyof Meta>(key: K) =>
       done(table(META).get(key)) as Promise<Meta[K] | undefined>,

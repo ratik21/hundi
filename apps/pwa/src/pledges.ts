@@ -17,12 +17,12 @@ export const PLEDGES: readonly Pledge[] = [
   },
   {
     glyph: "verified",
-    line: "Every note is checked right on this phone.",
+    line: "Every payment is checked right on this phone.",
     title: "Trusted with no network",
   },
   {
     glyph: "coins",
-    line: "Spend a note twice and your deposit pays.",
+    line: "Spend money twice and your deposit pays.",
     title: "Cheating costs double",
   },
   {

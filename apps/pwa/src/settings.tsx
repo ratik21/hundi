@@ -84,13 +84,13 @@ export const Settings = ({
         <div className="flex flex-col gap-5">
           <Switch
             checked={view.settings.submitDirectly}
-            help="Settle from this phone, with no relay service and no relay fee."
+            help="Claim from this phone, with no relay service and no relay fee."
             label="Submit directly"
             onChange={(submitDirectly) => update({ submitDirectly })}
           />
           <Switch
             checked={!view.settings.guard}
-            help="Lets this phone spend one note twice, to show what happens."
+            help="Lets this phone spend the same money twice, to show what happens."
             label="Demo: disable double-spend guard"
             onChange={(disabled) => update({ guard: !disabled })}
           />
@@ -98,8 +98,8 @@ export const Settings = ({
       </Card>
       {!view.settings.guard && (
         <Notice tone="warn">
-          With the guard off, this phone can spend one note twice. Your deposit
-          pays for it.
+          With the guard off, this phone can spend the same money twice. Your
+          deposit pays for it.
         </Notice>
       )}
 
@@ -107,7 +107,7 @@ export const Settings = ({
         <label className="flex flex-col gap-1">
           <span className="font-medium">Pay me out to</span>
           <span className="text-muted text-sm">
-            Where your money goes when you settle.
+            Where your money goes when you claim it.
           </span>
           <input
             className="border-line bg-raised mt-1 rounded-lg border px-3 py-2 font-mono text-sm"
@@ -130,6 +130,15 @@ export const Settings = ({
         <p className="text-muted mt-0.5 mb-4 text-sm">{TAGLINE}</p>
         <PledgeRows />
       </Card>
+
+      <details className="border-line bg-surface rounded-xl border p-4">
+        <summary className="font-medium">How your money works</summary>
+        <p className="text-muted mt-3 text-sm">
+          Hundi keeps your USDT as notes of 5 USDT, like cash. Each payment
+          hands over one whole note, with no change. That is what lets a payment
+          work with no signal.
+        </p>
+      </details>
 
       <details className="border-line bg-surface rounded-xl border p-4">
         <summary className="font-medium">About this phone</summary>

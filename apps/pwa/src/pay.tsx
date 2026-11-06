@@ -13,9 +13,13 @@ type Step =
 
 const NO_NOTE = "No note can pay this amount";
 
+const SHOWN: Record<string, string> = {
+  [NO_NOTE]: "You don't have enough to pay this",
+};
+
 const NEXT_STEPS: Record<string, string> = {
   [NO_NOTE]:
-    "You have no notes left to spend. Add money when you have signal, or receive a payment first.",
+    "Hundi pays in whole amounts of 5 USDT. Add money when you have signal, or receive a payment first.",
   "This request is for another network":
     "Ask them to open Receive in Hundi on their phone, then scan again.",
 };
@@ -77,7 +81,7 @@ export const Pay = ({
         next={NEXT_STEPS[step.message] ?? "Go back and try again."}
         onDone={onDone}
         title="Not paid"
-        what={`${step.message}. Nothing left your phone.`}
+        what={`${SHOWN[step.message] ?? step.message}. Nothing left your phone.`}
       />
     );
   }
@@ -107,12 +111,10 @@ export const Pay = ({
           <TokenIcon className="size-12" />
           <p className="text-muted mt-1">You are paying</p>
           <p className="tabular text-5xl font-semibold tracking-tight">
-            {amount === 0n ? "One note" : `${formatUsdt(amount)} USDT`}
+            {amount === 0n ? "One payment" : `${formatUsdt(amount)} USDT`}
           </p>
         </div>
-        <p className="text-muted text-center">
-          One whole note leaves your phone. It works with no signal.
-        </p>
+        <p className="text-muted text-center">This works with no signal.</p>
         {!guard && <Notice tone="warn">Demo: double-spend guard is off</Notice>}
         <div className="mt-auto">
           <Button onClick={() => confirm(step.request)}>Pay</Button>

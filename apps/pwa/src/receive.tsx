@@ -12,7 +12,7 @@ import { Verdict } from "./moments";
 import { Button, Camera, Notice, QrCode, Screen } from "./ui";
 
 const NOTE_USDT = 5;
-const ASK_ANOTHER = "Do not hand over the goods. Ask for another note.";
+const ASK_ANOTHER = "Do not hand over the goods. Ask them to pay another way.";
 
 const NEXT_STEPS: Record<RejectReason, string> = {
   bad_chain: ASK_ANOTHER,
@@ -101,8 +101,7 @@ export const Receive = ({
       <QrCode bytes={code} />
       <p className="tabular text-center text-4xl font-semibold">{amount}</p>
       <p className="text-muted text-center">
-        One payment is one note. Once they have paid, scan the code on their
-        phone.
+        Once they have paid, scan the code on their phone.
       </p>
       <div className="mt-auto">
         <Button onClick={() => setScanning(true)}>Scan their payment</Button>
