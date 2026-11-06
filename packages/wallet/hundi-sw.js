@@ -9,8 +9,13 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "hundi-cache") {
+    // One by one: `addAll` drops everything if a single file 404s.
     event.waitUntil(
-      caches.open(CACHE).then((cache) => cache.addAll(event.data.urls))
+      caches
+        .open(CACHE)
+        .then((cache) =>
+          Promise.allSettled(event.data.urls.map((url) => cache.add(url)))
+        )
     );
   }
 });
