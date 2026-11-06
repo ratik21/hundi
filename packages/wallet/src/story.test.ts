@@ -27,7 +27,7 @@ import { openWallet, usdt, type Wallet } from "./wallet";
  * While `offline` is true every RPC call throws, so the offline half has to
  * work with no network, not just pretend to.
  */
-const PORT = 8599;
+const PORT = 8598;
 const URL = `http://127.0.0.1:${PORT}`;
 const FORK_RPC = "https://rpc.testnet.whitechain.io/";
 const anvil = which("anvil") ?? which(`${process.env.HOME}/.foundry/bin/anvil`);

@@ -90,7 +90,7 @@ export const createHandler = (deps: RelayerDeps) => {
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: CORS, status: 204 });
     }
-    if (request.method !== "POST" || pathname !== "/submit") {
+    if (request.method !== "POST" || !pathname.endsWith("/submit")) {
       return refuse(404, "not_found");
     }
     if (!limiter.allow(ip, Date.now())) {
