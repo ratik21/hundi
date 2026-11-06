@@ -164,7 +164,7 @@ This is the highest risk on the device side. Run it in parallel, on throwaway pa
 
 **You see.**
 
-- [ ] Both phones load the app, go into airplane mode, close and reopen it, and it still runs. Evidence is a photo of each.
+- [ ] Both phones load the app, go into airplane mode, close and reopen it, and it still runs. Evidence is a photo of each. iPhone key `aba330f0` survived a real restart onto a new build. See `docs/ai/evidence/qr-iphone-key-after-restart.png`. The second phone is still open.
 - [ ] A 618-byte QR, the size of a four-hop payment, scans phone to phone within 5 seconds. Evidence is a short video. So far laptop to iPhone took 3.39 s in airplane mode and iPhone to laptop took 2.67 s. See `docs/ai/evidence/`. Phone to phone needs a second phone.
 - [x] The signature verifies on the receiving phone with no network. Evidence is `docs/ai/evidence/qr-laptop-to-iphone-618-airplane.png`.
 
