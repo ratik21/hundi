@@ -109,7 +109,7 @@ These checks stop someone draining it:
 - It accepts only `load` and `settle` calls to `HundiVault`.
 - It simulates every call first with `eth_simulateV1`, and sends nothing that would fail.
 - It reads the real payout from the simulated logs, and sends nothing unless the fee covers the gas.
-- It limits each IP address to 20 requests a minute.
+- It limits each IP address to 20 requests a minute on each running instance.
 
 A call can still revert if the chain changes between simulation and sending. The relayer loses that gas.
 
@@ -141,7 +141,7 @@ Hundi does not stop a double-spend. It makes one provable and costly.
 - A note can pass through four hops. After that, its holder must settle online.
 - The apps have no screens for `reclaim` or `withdrawBond`, although the contract has both.
 - Whitechain is an L2 with a sequencer, and USDT can be frozen by its issuer.
-- The relayer runs on a laptop through a tunnel. If the laptop stops, the relayer stops, and direct settlement still works.
+- The relayer is one hosted function with one key. If it stops, direct settlement still works.
 
 ## What is new and what is reused
 

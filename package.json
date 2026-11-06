@@ -13,7 +13,7 @@
     "fix": "ultracite fix",
     "lab": "scripts/lab/up.sh",
     "lab:drive": "browser-harness < scripts/lab/drive.py",
-    "relayer": "scripts/relayer-up.sh",
+    "relayer": "scripts/relayer-deploy.sh",
     "test": "bun test packages apps",
     "typecheck": "tsc --noEmit"
   },

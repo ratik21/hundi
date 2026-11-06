@@ -1,1 +1,1 @@
-https://ports-flags-stores-telecharger.trycloudflare.com
+https://hundi-relayer.vercel.app/api

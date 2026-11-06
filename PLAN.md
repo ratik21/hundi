@@ -242,7 +242,7 @@ ETHGlobal removes a project with no live deployment from finalist judging.
 - [x] Accept only calls to `HundiVault`. Run `eth_call` first, and send nothing that fails.
 - [x] Read the expected payout from the simulation, and require `min(fee, paid)` at or above the estimated gas cost.
 - [x] Rate-limit per IP.
-- [x] Deploy the relayer on Railway, or on the laptop through a tunnel if Railway fails. Runs on the laptop through a tunnel, with `bun run relayer`.
+- [x] Deploy the relayer on Railway, or on the laptop through a tunnel if Railway fails. Runs as a Vercel function at `hundi-relayer.vercel.app`, deployed with `bun run relayer`.
 - [x] Publish the PWA at a stable HTTPS URL with no analytics.
 
 **You see.**
@@ -271,6 +271,8 @@ This is what the Whitechain Operate track asks for.
 - [x] `apps/shop` takes a payment offline. Evidence is `docs/ai/evidence/shop-paid-offline.png`, plus the line count of the integration, 21 lines in `apps/shop/src/main.ts`. Tested in Chrome with a stubbed camera on a local fork. Not yet tested on a phone.
 
 ## Route reads through Anon-RPC (U8)
+
+**Dropped on 6 Nov.** The gateway did not answer, and CROPS does not need it. `docs/ai/evidence/anon-rpc-getlogs.md` has the test. The README states that reads are direct.
 
 Skip this unit if time runs short. Skipping it loses only the Anon-RPC entry, because CROPS stays eligible.
 
