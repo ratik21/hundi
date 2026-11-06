@@ -37,7 +37,9 @@ import {
   PledgeRows,
   RowIcon,
   Seal,
+  Sheet,
   TokenIcon,
+  useCopy,
 } from "./ui";
 import type { WalletView } from "./use-wallet";
 
@@ -410,26 +412,11 @@ const AccountSheet = ({
   onClose: () => void;
   online: boolean;
 }) => {
-  const [copied, setCopied] = useState(false);
-  const copy = useCallback(async () => {
-    await navigator.clipboard.writeText(address);
-    setCopied(true);
-  }, [address]);
+  const { copy, toast } = useCopy(address);
   const explorer = whitechainSepolia.blockExplorers.default.url;
   return (
-    <div className="fixed inset-0 z-10 flex flex-col justify-end">
-      <button
-        aria-label="Close"
-        className="absolute inset-0 bg-black/60"
-        onClick={onClose}
-        type="button"
-      />
-      <section
-        aria-label="Account"
-        aria-modal="true"
-        className="animate-lift bg-surface relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-3xl px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-        role="dialog"
-      >
+    <>
+      <Sheet label="Account" onClose={onClose}>
         <div className="flex items-center gap-3">
           <Seal className="size-11" />
           <div className="min-w-0 flex-1">
@@ -443,7 +430,7 @@ const AccountSheet = ({
             onClick={copy}
             type="button"
           >
-            {copied ? "Copied" : "Copy"}
+            Copy
           </button>
         </div>
         <div className="border-line flex items-center justify-between border-t pt-4 text-sm">
@@ -466,8 +453,9 @@ const AccountSheet = ({
         <Button onClick={() => go("settings")} variant="plain">
           Settings
         </Button>
-      </section>
-    </div>
+      </Sheet>
+      {toast}
+    </>
   );
 };
 

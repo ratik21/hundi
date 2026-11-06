@@ -91,6 +91,25 @@ def in_wallet(selector):
     assert box["width"] == 390 and box["inside"], (selector, box)
 
 
+def drag_handle(distance):
+    box = js("(()=>{const r=document.querySelector('[data-handle]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()")
+    mouse = {"x": box["x"], "button": "left", "clickCount": 1}
+    cdp("Input.dispatchMouseEvent", type="mousePressed", y=box["y"], **mouse)
+    cdp("Input.dispatchMouseEvent", type="mouseMoved", y=box["y"] + distance, **mouse)
+    cdp("Input.dispatchMouseEvent", type="mouseReleased", y=box["y"] + distance, **mouse)
+    time.sleep(0.5)
+
+
+def press(label):
+    box = js("(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===%s);const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()"
+             % json.dumps(label))
+    click_at_xy(box["x"], box["y"])
+
+
+def sheet_open():
+    return js("!!document.querySelector('[role=dialog]')")
+
+
 def request_from(name):
     use(name)
     tap("Receive")
@@ -172,7 +191,13 @@ assert cool_glow() == "0", "the glow should be marigold online"
 tap("Account")
 see("View on explorer")
 shot("customer-account")
-tap("Close")
+press("Copy")
+see("Copied", 1)
+shot("customer-copied", 0.2)
+drag_handle(30)
+assert sheet_open(), "a short drag should snap back"
+drag_handle(160)
+assert not sheet_open(), "a long drag should close the sheet"
 
 use("stall")
 see(TAGLINE)

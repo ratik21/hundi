@@ -1,8 +1,21 @@
 import { drawQr } from "@hundi/wallet/qr";
 import { startScan } from "@hundi/wallet/scanner";
-import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { reducedMotion } from "./motion";
 import { PLEDGES } from "./pledges";
 import { useOnline } from "./use-wallet";
+
+const SHEET_CLOSE_MS = 200;
+const DRAG_TAP_PX = 4;
+const DRAG_CLOSE_PX = 80;
+const TOAST_MS = 1400;
 
 const PAGE =
   "mx-auto flex min-h-(--app-height) max-w-md flex-col gap-5 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]";
@@ -220,6 +233,135 @@ export const Notice = ({
   return (
     <p className={`rounded-xl px-3 py-2 text-sm ${tones[tone]}`}>{children}</p>
   );
+};
+
+/** Slides up over the page. Drag the handle down, tap outside, or press Escape to close. */
+export const Sheet = ({
+  children,
+  label,
+  onClose,
+}: {
+  children: ReactNode;
+  label: string;
+  onClose: () => void;
+}) => {
+  const [closing, setClosing] = useState(false);
+  const [dragged, setDragged] = useState<number | null>(null);
+  const grabbedAt = useRef<number | null>(null);
+  const travelled = useRef(0);
+
+  const close = useCallback(() => {
+    if (reducedMotion()) {
+      onClose();
+      return;
+    }
+    setClosing(true);
+    setTimeout(onClose, SHEET_CLOSE_MS);
+  }, [onClose]);
+
+  useEffect(() => {
+    const onKey = ({ key }: KeyboardEvent) => {
+      if (key === "Escape") {
+        close();
+      }
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, [close]);
+
+  const release = () => {
+    const distance = dragged ?? 0;
+    grabbedAt.current = null;
+    travelled.current = distance;
+    setDragged(null);
+    if (distance >= DRAG_CLOSE_PX) {
+      close();
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-10 flex flex-col justify-end">
+      <button
+        aria-label="Close"
+        className={`animate-fade absolute inset-0 bg-black/60 transition-opacity duration-200 ${
+          closing ? "opacity-0" : ""
+        }`}
+        onClick={close}
+        type="button"
+      />
+      <section
+        aria-label={label}
+        aria-modal="true"
+        className={`animate-sheet bg-surface relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-3xl px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] ${
+          dragged === null ? "transition-[translate] duration-200 ease-out" : ""
+        }`}
+        role="dialog"
+        style={{ translate: closing ? "0 100%" : `0 ${dragged ?? 0}px` }}
+      >
+        <button
+          aria-label="Drag down to close"
+          className="-mb-2 flex h-7 w-full shrink-0 touch-none items-center justify-center"
+          data-handle
+          onClick={() => {
+            if (travelled.current < DRAG_TAP_PX) {
+              close();
+            }
+            travelled.current = 0;
+          }}
+          onPointerCancel={release}
+          onPointerDown={(event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            grabbedAt.current = event.clientY;
+          }}
+          onPointerMove={(event) => {
+            if (grabbedAt.current !== null) {
+              setDragged(Math.max(0, event.clientY - grabbedAt.current));
+            }
+          }}
+          onPointerUp={release}
+          type="button"
+        >
+          <span className="bg-line h-1 w-10 rounded-full" />
+        </button>
+        {children}
+      </section>
+    </div>
+  );
+};
+
+/** `toast` must render outside any sheet, whose slide would pin it to the sheet. */
+export const useCopy = (text: string) => {
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (!message) {
+      return;
+    }
+    const timer = setTimeout(() => setMessage(""), TOAST_MS);
+    return () => clearTimeout(timer);
+  }, [message]);
+
+  const copy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setMessage("Copied");
+    } catch {
+      setMessage("Could not copy");
+    }
+  }, [text]);
+
+  const toast = message && (
+    <p
+      className="animate-toast pointer-events-none fixed inset-x-0 top-[max(4.5rem,calc(env(safe-area-inset-top)+3.5rem))] z-20 flex justify-center"
+      role="status"
+    >
+      <span className="bg-raised ring-line rounded-full px-4 py-2 text-sm font-semibold shadow-lg ring-1">
+        {message}
+      </span>
+    </p>
+  );
+
+  return { copy, toast };
 };
 
 export const Stepper = ({

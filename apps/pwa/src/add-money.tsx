@@ -1,7 +1,7 @@
 import { formatUsdt, usdt, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useEffect, useState } from "react";
 import { Working } from "./moments";
-import { Button, Card, Notice, Screen, Stepper } from "./ui";
+import { Button, Card, Notice, Screen, Stepper, useCopy } from "./ui";
 import type { WalletView } from "./use-wallet";
 
 const NOTE_USDT = 5;
@@ -72,7 +72,7 @@ export const AddMoney = ({
   const [funds, setFunds] = useState<bigint | null>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
-  const [copied, setCopied] = useState(false);
+  const { copy, toast } = useCopy(wallet.address);
 
   const checkFunds = useCallback(() => {
     wallet.funds().then(setFunds, () => setFunds(null));
@@ -105,11 +105,6 @@ export const AddMoney = ({
       setBusy(false);
     }
   }, [count, deposit, onDone, wallet]);
-
-  const copy = useCallback(async () => {
-    await navigator.clipboard.writeText(wallet.address);
-    setCopied(true);
-  }, [wallet]);
 
   if (busy) {
     return (
@@ -198,7 +193,7 @@ export const AddMoney = ({
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Button onClick={copy} variant="plain">
-              {copied ? "Copied" : "Copy"}
+              Copy
             </Button>
             <Button onClick={checkFunds} variant="plain">
               Check again
@@ -220,6 +215,7 @@ export const AddMoney = ({
           Add {total} USDT
         </Button>
       </div>
+      {toast}
     </Screen>
   );
 };
