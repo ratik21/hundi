@@ -2,7 +2,7 @@
 
 These are the prompts that directed the build from the start of U0, word for word. The design work before U0 is recorded in `PLAN.md` Appendix C.
 
-## Resume prompt
+## Opening prompt
 
 ```text
 Resume Hundi for ETHGlobal Mumbai. Submissions close Sat 7 Nov 09:00 IST.
@@ -26,21 +26,6 @@ Rules:
 - Stop and ask me for anything only I can do: phones, GitHub consent screens, the ETHGlobal form.
 
 The first real risks are U2 (a real USDT settlement) and U3 (QR between two phones in airplane mode). Prove both before building anything else.
-```
-
-## Later messages
-
-```text
-I'm assuming you are doing everything on testnet, right?
-(do only test stuff)
-how are we doing now?
-What do i need to do tell me here? Also shouldn't we build an app for this? seems to be like an app interface/design.. And just let me know what I need to test as well
-got this: [screenshot of a 618-byte scan, valid signature in 3.39 s, in airplane mode]
-yes start
-yes start U5
-yes start U6
-yes start U7
-yes, start
 ```
 
 ## Subagent briefs
@@ -71,3 +56,25 @@ Do this in a throwaway project, following the CONVENTIONS.md section on Anon-RPC
 
 Save the raw results to docs/ai/evidence/anon-rpc-getlogs.md. If the gateway is down or getLogs fails, say so plainly: that is a valid result. Do not build the fallback.
 ```
+
+## Go-aheads and check-ins
+
+The plan defines each unit, so most of these only start the next one.
+
+<details>
+<summary>Show all</summary>
+
+```text
+I'm assuming you are doing everything on testnet, right?
+(do only test stuff)
+how are we doing now?
+What do i need to do tell me here? Also shouldn't we build an app for this? seems to be like an app interface/design.. And just let me know what I need to test as well
+got this: [screenshot of a 618-byte scan, valid signature in 3.39 s, in airplane mode]
+yes start
+yes start U5
+yes start U6
+yes start U7
+yes, start
+```
+
+</details>
