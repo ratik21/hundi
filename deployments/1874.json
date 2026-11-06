@@ -1,0 +1,9 @@
+{
+  "chainId": 1874,
+  "vault": "0x422d3a4745cfdeb1be99772ef636e827c892c45a",
+  "usdt": "0xcedfB56113143d55b2358b8CFbB0dEB5Ad2f55a7",
+  "grace": 3600,
+  "maxLifetime": 604800,
+  "deployTx": "0x37d1aa72ff16ffbb496f350ea5a1f3acecd1b057be1dff95c77714d6e19046e9",
+  "deployBlock": 12357204
+}
