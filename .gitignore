@@ -16,3 +16,4 @@ HANDOFF.md
 .claude/
 .lab/
 .relayer-deploy/
+__pycache__/
