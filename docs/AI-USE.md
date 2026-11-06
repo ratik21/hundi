@@ -50,4 +50,4 @@ Hundi started from an empty repo at this event. Only setup files, Whitechain cha
 | `apps/relayer/`, `apps/shop/`, `scripts/` | Claude Code (Opus 5.5) | From the plan |
 | `README.md`, `docs/` | Claude Code (Opus 5.5) | Checked against the code and the chain |
 
-All prompts are in [`docs/ai/prompts.md`](ai/prompts.md).
+The key prompts are in [`docs/ai/prompts.md`](ai/prompts.md), and every message is in the [full prompt log](ai/prompt-log.md).

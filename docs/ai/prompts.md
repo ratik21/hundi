@@ -1,6 +1,6 @@
 # Prompts
 
-These are the prompts that directed the build from the start of U0, word for word. The design work before U0 is recorded in `PLAN.md` Appendix C.
+These are the prompts that directed the build from the start of U0, word for word. The design work before U0 is recorded in `PLAN.md` Appendix C. Every message from the first idea onward is in the [full prompt log](prompt-log.md).
 
 ## Opening prompt
 
