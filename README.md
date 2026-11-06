@@ -4,6 +4,7 @@
   <p><b>Money that works when the network doesn't.</b></p>
   <p>Pay in USDT from a phone in airplane mode. The person you pay can spend that money again, also offline.<br>If someone spends the same money twice, the contract takes it from their deposit.</p>
   <p>
+    <a href="docs/assets/hundi-demo.mp4"><b>Watch the demo</b></a> ·
     <a href="https://hundi-ten.vercel.app"><b>Try the wallet</b></a> ·
     <a href="https://hundi-shop.vercel.app">Coffee shop demo</a> ·
     <a href="https://explorer.testnet.whitechain.io/address/0x422d3a4745cfdeb1be99772ef636e827c892c45a">Contract</a> ·
