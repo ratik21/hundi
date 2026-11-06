@@ -7,6 +7,7 @@ import {
   offeredFee,
   type RateLimiter,
 } from "./policy";
+import { refill } from "./refill";
 
 const MAX_CALLDATA_CHARS = 8192;
 
@@ -82,6 +83,10 @@ export const createHandler = (deps: RelayerDeps) => {
       })
     );
     log({ earned, hash }, "sent");
+    // A failed refill must never fail the settle that was already sent.
+    await inTurn(() => refill(deps))
+      .then((swap) => swap && log({ swap }, "refilled gas"))
+      .catch((cause: Error) => log({ reason: cause.message }, "refill failed"));
     return json(200, { hash });
   };
 

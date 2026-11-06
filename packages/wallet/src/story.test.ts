@@ -345,6 +345,40 @@ describe.skipIf(!anvil)("Appendix F story", () => {
       expect(await reads.getBalance({ address: stall.address })).toBe(0n);
     }, 120_000);
 
+    test("a relayer low on gas buys more through Uniswap as it settles", async () => {
+      const lowGas = parseEther("0.05");
+      await control.setBalance({
+        address: relayerAccount.address,
+        value: lowGas,
+      });
+      await control.request({
+        method: "anvil_dealERC20",
+        params: [relayerAccount.address, USDT, toHex(usdt(10))],
+      } as never);
+      const customer = await newWallet(memoryStore(), RELAYER_URL);
+      const stall = await newWallet(memoryStore(), RELAYER_URL);
+      await fund(customer, usdt(15.1), 0n);
+      await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+      await stall.sync();
+      const target = stall.request(usdt(5));
+      await stall.receive(await customer.pay(target), target);
+      const before = await usdtOf(relayerAccount.address);
+      const gasBefore = await reads.getBalance({
+        address: relayerAccount.address,
+      });
+
+      const [report] = await stall.settle();
+
+      expect(report).toMatchObject({ kind: "paid", paid: usdt(4.9) });
+      expect(await usdtOf(relayerAccount.address)).toBe(
+        before + usdt(0.1) - usdt(2)
+      );
+      expect(
+        await reads.getBalance({ address: relayerAccount.address })
+      ).toBeGreaterThan(gasBefore + parseEther("0.02"));
+      expect(sent.some((fields) => "swap" in fields)).toBe(true);
+    }, 120_000);
+
     test("Submit directly works when the relayer lookup is gone", async () => {
       const customer = await newWallet();
       const stall = await newWallet(memoryStore(), () =>

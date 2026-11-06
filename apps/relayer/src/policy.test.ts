@@ -5,7 +5,11 @@ import {
   earnedFee,
   fixedWindowLimiter,
   gasCostInAtoms,
+  leastWeiFor,
   offeredFee,
+  REFILL_ATOMS,
+  REFILL_BELOW_WEI,
+  refillAtoms,
 } from "./policy";
 
 const ZERO = `0x${"00".repeat(32)}` as Hex;
@@ -55,5 +59,31 @@ describe("fixedWindowLimiter", () => {
     expect(limiter.allow("a", 2)).toBe(false);
     expect(limiter.allow("b", 2)).toBe(true);
     expect(limiter.allow("a", 1000)).toBe(true);
+  });
+});
+
+describe("refillAtoms", () => {
+  const low = REFILL_BELOW_WEI - 1n;
+
+  test("buys gas once WBT runs low", () => {
+    expect(refillAtoms({ usdt: 10_000_000n, wbt: low })).toBe(REFILL_ATOMS);
+  });
+
+  test("does nothing with enough WBT", () => {
+    expect(
+      refillAtoms({ usdt: 10_000_000n, wbt: REFILL_BELOW_WEI })
+    ).toBeUndefined();
+  });
+
+  test("keeps a reserve of USDT", () => {
+    expect(
+      refillAtoms({ usdt: 2n * REFILL_ATOMS - 1n, wbt: low })
+    ).toBeUndefined();
+  });
+});
+
+describe("leastWeiFor", () => {
+  test("accepts 90 percent of the fixed rate", () => {
+    expect(leastWeiFor(75_000_000n)).toBe(9n * 10n ** 17n);
   });
 });

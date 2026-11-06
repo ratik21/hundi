@@ -55,6 +55,32 @@ export const earnedFee = (
 export const gasCostInAtoms = (gas: bigint, gasPrice: bigint): bigint =>
   (gas * gasPrice * USDT_PER_WBT) / WEI_PER_ATOM;
 
+/** Below this the relayer buys gas with the USDT fees it has earned. */
+export const REFILL_BELOW_WEI = 10n ** 17n;
+/** About 40 settles of gas. Small, so one bad price can only cost a little. */
+export const REFILL_ATOMS = 2_000_000n;
+const REFILL_RESERVE = 2n;
+const FLOOR_PERCENT = 90n;
+const PERCENT = 100n;
+
+export interface Balances {
+  usdt: bigint;
+  wbt: bigint;
+}
+
+/** How much USDT to swap for gas, if any. */
+export const refillAtoms = (
+  { usdt, wbt }: Balances,
+  below = REFILL_BELOW_WEI
+): bigint | undefined =>
+  wbt < below && usdt >= REFILL_RESERVE * REFILL_ATOMS
+    ? REFILL_ATOMS
+    : undefined;
+
+/** A fixed floor, so a moved pool cannot sell the relayer's fees cheap. */
+export const leastWeiFor = (atoms: bigint): bigint =>
+  (atoms * WEI_PER_ATOM * FLOOR_PERCENT) / (USDT_PER_WBT * PERCENT);
+
 export interface RateLimiter {
   allow: (ip: string, now: number) => boolean;
 }
