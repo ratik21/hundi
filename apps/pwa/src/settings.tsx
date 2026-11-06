@@ -30,7 +30,7 @@ const Switch = ({
       />
       <span
         aria-hidden="true"
-        className="bg-sand peer-checked:bg-indigo peer-focus-visible:outline-indigo relative h-7 w-12 shrink-0 rounded-full transition peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"
+        className="bg-raised peer-checked:bg-accent peer-focus-visible:outline-accent relative h-7 w-12 shrink-0 rounded-full transition peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 after:absolute after:top-0.5 after:left-0.5 after:size-6 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"
       />
     </label>
     <p className="text-muted mt-1 pr-16 text-sm">{help}</p>
@@ -109,7 +109,7 @@ export const Settings = ({
             Where your money goes when you settle.
           </span>
           <input
-            className="border-sand mt-1 rounded-lg border bg-white px-3 py-2 font-mono text-sm"
+            className="border-line bg-raised mt-1 rounded-lg border px-3 py-2 font-mono text-sm"
             onChange={(event) => {
               setSaved(false);
               setPayTo(event.target.value as Address);
@@ -124,7 +124,7 @@ export const Settings = ({
         </div>
       </Card>
 
-      <details className="border-sand bg-card rounded-xl border p-4">
+      <details className="border-line bg-surface rounded-xl border p-4">
         <summary className="font-medium">About this phone</summary>
         <div className="mt-3 flex flex-col gap-3">
           <Row label="Device key" value={fingerprint} />

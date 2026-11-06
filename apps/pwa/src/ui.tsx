@@ -12,26 +12,11 @@ export const Page = ({ children }: { children: ReactNode }) => (
 
 export const Seal = ({ className = "size-9" }: { className?: string }) => (
   <svg aria-hidden="true" className={className} viewBox="0 0 40 40">
-    <circle
-      className="stroke-clay"
-      cx="20"
-      cy="20"
-      fill="none"
-      r="18.5"
-      strokeWidth="2"
-    />
-    <circle
-      className="stroke-clay"
-      cx="20"
-      cy="20"
-      fill="none"
-      r="15.5"
-      strokeWidth="0.75"
-    />
+    <circle className="fill-accent" cx="20" cy="20" r="20" />
     <text
-      className="fill-clay"
+      className="fill-on-accent"
       dominantBaseline="central"
-      fontSize="17"
+      fontSize="19"
       fontWeight="700"
       textAnchor="middle"
       x="20"
@@ -39,6 +24,67 @@ export const Seal = ({ className = "size-9" }: { className?: string }) => (
     >
       हुं
     </text>
+  </svg>
+);
+
+export const TokenIcon = ({
+  className = "size-10",
+}: {
+  className?: string;
+}) => (
+  <svg aria-hidden="true" className={className} viewBox="0 0 40 40">
+    <circle className="fill-tether" cx="20" cy="20" r="20" />
+    <path
+      d="M12 11h16M20 11v18M13 18c4 1.6 10 1.6 14 0"
+      fill="none"
+      stroke="white"
+      strokeLinecap="round"
+      strokeWidth="3"
+    />
+  </svg>
+);
+
+/** A round glyph at the start of a list row. */
+export const RowIcon = ({
+  children,
+  tone = "text-fg",
+}: {
+  children: ReactNode;
+  tone?: string;
+}) => (
+  <span
+    className={`bg-raised grid size-10 shrink-0 place-items-center rounded-full ${tone}`}
+  >
+    {children}
+  </span>
+);
+
+const GLYPHS = {
+  check: "M5 12.5l4.5 4.5L19 7.5",
+  down: "M12 5v14M6 13l6 6 6-6",
+  plus: "M12 5v14M5 12h14",
+  shield: "M12 3l7 3v5.5c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5V6z",
+  up: "M12 19V5M6 11l6-6 6 6",
+};
+
+export const Glyph = ({
+  className = "size-5",
+  name,
+}: {
+  className?: string;
+  name: keyof typeof GLYPHS;
+}) => (
+  <svg
+    aria-hidden="true"
+    className={className}
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth="2.2"
+    viewBox="0 0 24 24"
+  >
+    <path d={GLYPHS[name]} />
   </svg>
 );
 
@@ -87,11 +133,9 @@ export const Screen = ({
             </svg>
           </button>
         )}
-        <h1 className="min-w-0 flex-1 font-serif text-[1.4rem] font-semibold">
-          {title}
-        </h1>
+        <h1 className="min-w-0 flex-1 text-[1.4rem] font-semibold">{title}</h1>
         {!online && (
-          <span className="bg-indigo text-paper flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold">
+          <span className="bg-accent text-on-accent flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold">
             <Plane className="size-4" />
             Offline
           </span>
@@ -103,9 +147,9 @@ export const Screen = ({
 };
 
 const BUTTON = {
-  light: "bg-card text-ink",
-  plain: "border border-ink/20 bg-card text-ink",
-  primary: "bg-indigo text-card",
+  light: "bg-white text-black",
+  plain: "border border-line bg-surface text-fg",
+  primary: "bg-accent text-on-accent",
 } as const;
 
 export const Button = ({
@@ -120,7 +164,7 @@ export const Button = ({
   variant?: keyof typeof BUTTON;
 }) => (
   <button
-    className={`w-full rounded-xl px-4 py-4 text-lg font-semibold transition active:scale-[0.98] disabled:opacity-40 ${BUTTON[variant]}`}
+    className={`w-full rounded-2xl px-4 py-4 text-lg font-semibold transition active:scale-[0.98] disabled:opacity-40 ${BUTTON[variant]}`}
     disabled={disabled}
     onClick={onClick}
     type="button"
@@ -130,7 +174,7 @@ export const Button = ({
 );
 
 export const Card = ({ children }: { children: ReactNode }) => (
-  <section className="border-sand bg-card rounded-xl border p-4">
+  <section className="border-line bg-surface rounded-2xl border p-4">
     {children}
   </section>
 );
@@ -143,43 +187,14 @@ export const Notice = ({
   tone?: "bad" | "plain" | "warn";
 }) => {
   const tones = {
-    bad: "bg-clay/10 text-clay",
-    plain: "bg-sand/60 text-ink",
-    warn: "bg-gold/15 text-gold",
+    bad: "bg-bad/15 text-bad",
+    plain: "bg-raised text-fg",
+    warn: "bg-warn/15 text-warn",
   };
   return (
-    <p className={`rounded-lg px-3 py-2 text-sm ${tones[tone]}`}>{children}</p>
+    <p className={`rounded-xl px-3 py-2 text-sm ${tones[tone]}`}>{children}</p>
   );
 };
-
-/** A paper note, with one sheet showing beneath it per extra note. */
-export const Note = ({
-  blank = false,
-  children,
-  sheets = 0,
-}: {
-  blank?: boolean;
-  children: ReactNode;
-  sheets?: number;
-}) => (
-  <div className="relative" style={{ marginBottom: Math.min(sheets, 2) * 8 }}>
-    {sheets > 1 && (
-      <div
-        aria-hidden="true"
-        className="note-sheet"
-        style={{ transform: "translateY(16px) scale(0.93)" }}
-      />
-    )}
-    {sheets > 0 && (
-      <div
-        aria-hidden="true"
-        className="note-sheet"
-        style={{ transform: "translateY(8px) scale(0.965)" }}
-      />
-    )}
-    <div className={`note p-5 ${blank ? "note-blank" : ""}`}>{children}</div>
-  </div>
-);
 
 export const Stepper = ({
   label,
@@ -206,7 +221,7 @@ export const Stepper = ({
       <div className="flex gap-2">
         <button
           aria-label={`Less ${label}`}
-          className="border-sand size-11 rounded-full border text-xl"
+          className="border-line size-11 rounded-full border text-xl"
           onClick={() => change(-step)}
           type="button"
         >
@@ -214,7 +229,7 @@ export const Stepper = ({
         </button>
         <button
           aria-label={`More ${label}`}
-          className="border-sand size-11 rounded-full border text-xl"
+          className="border-line size-11 rounded-full border text-xl"
           onClick={() => change(step)}
           type="button"
         >
@@ -291,16 +306,16 @@ export const Camera = ({
   }, []);
 
   return (
-    <div className="bg-ink relative aspect-square w-full overflow-hidden rounded-xl">
+    <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-black">
       <video className="size-full object-cover" muted playsInline ref={video} />
       <div aria-hidden="true" className="absolute inset-0">
         {CORNERS.map((corner) => (
           <span
-            className={`border-card absolute size-12 ${corner}`}
+            className={`absolute size-12 border-white ${corner}`}
             key={corner}
           />
         ))}
-        <span className="animate-sweep bg-card/70 absolute inset-x-10 h-0.5 rounded-full" />
+        <span className="animate-sweep absolute inset-x-10 h-0.5 rounded-full bg-white/70" />
       </div>
     </div>
   );

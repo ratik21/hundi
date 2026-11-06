@@ -30,6 +30,16 @@ export interface SettleSummary {
   word: SettleWord;
 }
 
+const ATOMS_PER_USDT = 1_000_000n;
+const ATOMS_PER_CENT = 10_000n;
+const CENTS_DIGITS = 2;
+
+/** One USDT shown as one dollar, the way a wallet shows a stablecoin. */
+export const dollars = (atoms: bigint): string => {
+  const cents = (atoms % ATOMS_PER_USDT) / ATOMS_PER_CENT;
+  return `$${atoms / ATOMS_PER_USDT}.${String(cents).padStart(CENTS_DIGITS, "0")}`;
+};
+
 export const noteGroups = (records: readonly NoteRecord[]): NoteGroup[] => {
   const counts = new Map<bigint, number>();
   for (const { state } of records) {

@@ -16,7 +16,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       manifest: {
-        background_color: "#f1e9da",
+        background_color: "#0d1014",
         description: "Pay in USDT with no network.",
         display: "standalone",
         icons: [
@@ -33,7 +33,7 @@ export default defineConfig({
         scope: "/",
         short_name: "Hundi",
         start_url: "/",
-        theme_color: "#f1e9da",
+        theme_color: "#0d1014",
       },
       registerType: "autoUpdate",
       workbox: {

@@ -99,9 +99,7 @@ export const Receive = ({
   return (
     <Screen onBack={onDone} title="Ask them to scan">
       <QrCode bytes={code} />
-      <p className="tabular text-center font-serif text-4xl font-semibold">
-        {amount}
-      </p>
+      <p className="tabular text-center text-4xl font-semibold">{amount}</p>
       <p className="text-muted text-center">
         One payment is one note. Once they have paid, scan the code on their
         phone.

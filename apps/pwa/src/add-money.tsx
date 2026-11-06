@@ -33,14 +33,14 @@ const Choice = ({
 }) => (
   <button
     aria-pressed={picked}
-    className={`bg-card flex w-full items-start justify-between gap-3 rounded-xl p-4 text-left transition ${
-      picked ? "ring-indigo ring-2" : "ring-sand ring-1"
+    className={`bg-surface flex w-full items-start justify-between gap-3 rounded-xl p-4 text-left transition ${
+      picked ? "ring-accent ring-2" : "ring-line ring-1"
     }`}
     onClick={onPick}
     type="button"
   >
     <span className="min-w-0">
-      <span className="block font-serif text-xl font-semibold">{title}</span>
+      <span className="block text-xl font-semibold">{title}</span>
       <span className="text-muted mt-0.5 block text-sm">{why}</span>
       <span className="mt-2 block text-sm font-medium">{detail}</span>
     </span>

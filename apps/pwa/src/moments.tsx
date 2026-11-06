@@ -4,8 +4,8 @@ import { Button, Page, Seal } from "./ui";
 const LONG_WORD = 8;
 
 const TONES = {
-  bad: { page: "bg-clay", stamp: "text-clay", thud: "animate-shake" },
-  ok: { page: "bg-leaf", stamp: "text-leaf", thud: "animate-thud" },
+  bad: { page: "bg-stamp-bad", stamp: "text-stamp-bad", thud: "animate-shake" },
+  ok: { page: "bg-stamp-ok", stamp: "text-stamp-ok", thud: "animate-thud" },
 } as const;
 
 /** The stamp comes down on a paper note. The moment a demo is filmed for. */
@@ -35,8 +35,10 @@ export const Verdict = ({
       data-verdict={verdict}
     >
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-7">
-        <div className={`note text-ink px-6 pt-8 pb-36 text-center ${thud}`}>
-          <p className="text-muted text-sm">Hundi</p>
+        <div
+          className={`note text-note-ink px-6 pt-8 pb-36 text-center ${thud}`}
+        >
+          <p className="text-note-muted text-sm">Hundi</p>
           {amount && (
             <p className="tabular mt-1 font-serif text-5xl font-semibold">
               {amount}
@@ -84,7 +86,7 @@ export const Working = ({
       <Seal className="size-24" />
     </div>
     <div>
-      <p className="font-serif text-2xl font-semibold">{title}</p>
+      <p className="text-2xl font-semibold">{title}</p>
       <p className="text-muted mt-2">{detail}</p>
     </div>
   </main>
@@ -106,8 +108,8 @@ export const Failure = ({
 }) => (
   <Page>
     <div className="animate-lift flex flex-1 flex-col justify-center gap-5">
-      <div className="note px-6 py-8">
-        <h1 className="text-clay font-serif text-4xl font-semibold">{title}</h1>
+      <div className="border-line bg-surface rounded-2xl border px-6 py-8">
+        <h1 className="text-bad text-3xl font-semibold">{title}</h1>
         <p className="mt-3 text-lg font-medium">{what}</p>
       </div>
       <div className="px-1">

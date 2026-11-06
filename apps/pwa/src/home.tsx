@@ -1,15 +1,16 @@
-import { receiptUrl } from "@hundi/wallet/chain-io";
+import { receiptUrl, whitechainSepolia } from "@hundi/wallet/chain-io";
 import {
   formatUsdt,
   type SettleResult,
   type Wallet,
 } from "@hundi/wallet/wallet";
-import { useCallback, useState } from "react";
+import { type ReactNode, useCallback, useState } from "react";
 import type { Route } from "./app";
 import {
   type Activity,
   type ActivityKind,
   activityOf,
+  dollars,
   groupsTotal,
   type NoteGroup,
   noteGroups,
@@ -17,12 +18,22 @@ import {
   settleSummary,
 } from "./ledger";
 import { Verdict, Working } from "./moments";
-import { Button, Card, Note, Notice, Page, Plane, Seal } from "./ui";
+import {
+  Button,
+  Card,
+  Glyph,
+  Notice,
+  Page,
+  Plane,
+  RowIcon,
+  Seal,
+  TokenIcon,
+} from "./ui";
 import type { WalletView } from "./use-wallet";
 
 const MINUTE = 60n;
 const HOUR = 3600n;
-const MAX_CHIPS = 6;
+const ADDRESS_EDGE = 6;
 const NO_NETWORK = "Could not reach the network. Try again.";
 
 const syncedLabel = (syncedAt: bigint): string => {
@@ -43,34 +54,45 @@ const groupLabel = ({ count, face }: NoteGroup): string =>
 
 const ACTIVITY: Record<
   ActivityKind,
-  { detail: string; sign: string; title: string; tone: string }
+  {
+    detail: string;
+    glyph: "check" | "down" | "shield" | "up";
+    sign: string;
+    title: string;
+    tone: string;
+  }
 > = {
   covered: {
     detail: "Someone spent this note twice. Their deposit paid you.",
+    glyph: "shield",
     sign: "+",
     title: "Covered by a deposit",
-    tone: "text-leaf",
+    tone: "text-good",
   },
   covered_in_part: {
     detail: "Someone spent this note twice. Their deposit paid part of it.",
+    glyph: "shield",
     sign: "+",
     title: "Covered in part",
-    tone: "text-gold",
+    tone: "text-warn",
   },
   paid_out: {
     detail: "This money is yours to keep.",
+    glyph: "check",
     sign: "+",
     title: "Paid out to you",
-    tone: "text-leaf",
+    tone: "text-good",
   },
   received: {
     detail: "Spend it on, or settle it for cash.",
+    glyph: "down",
     sign: "+",
     title: "Received",
-    tone: "text-ink",
+    tone: "text-fg",
   },
   sent: {
     detail: "You paid with this note.",
+    glyph: "up",
     sign: "−",
     title: "Sent",
     tone: "text-muted",
@@ -144,11 +166,11 @@ const SettleDone = ({
 };
 
 const OfflineBand = () => (
-  <section className="bg-indigo text-card animate-lift flex items-center gap-3 rounded-xl px-4 py-3">
-    <Plane className="size-6 shrink-0" />
+  <section className="animate-lift border-accent/40 bg-accent/10 flex items-center gap-3 rounded-2xl border px-4 py-3">
+    <Plane className="text-accent size-6 shrink-0" />
     <div>
       <p className="font-semibold">Offline. Payments still work.</p>
-      <p className="text-card/80 text-sm">
+      <p className="text-muted text-sm">
         Hundi checks every note right here on this phone.
       </p>
     </div>
@@ -157,18 +179,13 @@ const OfflineBand = () => (
 
 const Welcome = ({ go }: { go: (route: Route) => void }) => (
   <>
-    <Note blank>
-      <div className="flex flex-col items-center gap-2 py-5 text-center">
-        <Seal className="size-14 opacity-90" />
-        <h1 className="mt-2 font-serif text-3xl font-semibold">
-          Nothing here yet
-        </h1>
-        <p className="text-muted">
-          Add money once while you have signal. After that, you can pay with
-          none.
-        </p>
-      </div>
-    </Note>
+    <div className="flex flex-col items-center gap-2 py-10 text-center">
+      <Seal className="size-16" />
+      <h1 className="mt-3 text-3xl font-semibold">Nothing here yet</h1>
+      <p className="text-muted">
+        Add money once while you have signal. After that, you can pay with none.
+      </p>
+    </div>
     <Button onClick={() => go("add")}>Add money</Button>
     <Button onClick={() => go("receive")} variant="plain">
       Receive
@@ -179,72 +196,113 @@ const Welcome = ({ go }: { go: (route: Route) => void }) => (
   </>
 );
 
-const NoteChips = ({ groups }: { groups: readonly NoteGroup[] }) => (
-  <span aria-hidden="true" className="flex gap-1">
-    {groups
-      .flatMap(({ count, face }) => Array.from({ length: count }, () => face))
-      .slice(0, MAX_CHIPS)
-      .map((face, index) => (
-        <span
-          className="border-ink/25 bg-paper tabular grid h-6 w-9 place-items-center rounded-sm border font-serif text-sm font-semibold"
-          // biome-ignore lint/suspicious/noArrayIndexKey: identical chips with no identity of their own.
-          key={index}
-        >
-          {formatUsdt(face)}
-        </span>
-      ))}
-  </span>
+const Balance = ({ total }: { total: bigint }) => (
+  <section className="animate-lift py-3 text-center">
+    <p className="text-muted font-medium">You can spend</p>
+    <p className="tabular mt-1 text-6xl font-semibold tracking-tight">
+      {dollars(total)}
+    </p>
+    <p className="tabular text-muted mt-1">{formatUsdt(total)} USDT</p>
+  </section>
 );
 
-const Balance = ({ groups }: { groups: readonly NoteGroup[] }) => {
-  const count = groups.reduce((sum, group) => sum + group.count, 0);
-  return (
-    <section className="animate-lift" key={count}>
-      <Note sheets={count - 1}>
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-muted font-medium">You can spend</p>
-          <Seal />
-        </div>
-        <p className="tabular -mt-2 font-serif text-6xl font-semibold tracking-tight">
-          {formatUsdt(groupsTotal(groups))}
-          <span className="text-muted ml-2 font-sans text-2xl font-semibold">
-            USDT
-          </span>
-        </p>
-        <div className="border-sand mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t pt-3">
-          {count > 0 && <NoteChips groups={groups} />}
-          <p className="font-medium">
-            {count > 0
-              ? groups.map(groupLabel).join(", ")
-              : "No notes right now. Receive a payment, or add money."}
-          </p>
-        </div>
-      </Note>
-      {count > 0 && (
-        <p className="text-muted mt-3 px-1 text-sm">
-          Notes work like cash. A payment spends one whole note, with no change.
-        </p>
-      )}
-    </section>
-  );
-};
+const Action = ({
+  disabled = false,
+  glyph,
+  highlight = false,
+  label,
+  name,
+  onClick,
+}: {
+  disabled?: boolean;
+  glyph: "check" | "down" | "plus" | "up";
+  highlight?: boolean;
+  label?: string;
+  name: string;
+  onClick: () => void;
+}) => (
+  <button
+    aria-label={label}
+    className="flex flex-col items-center gap-1.5 text-sm font-medium transition active:scale-95 disabled:opacity-40"
+    disabled={disabled}
+    onClick={onClick}
+    type="button"
+  >
+    <span
+      className={`grid size-14 place-items-center rounded-full ${
+        highlight ? "bg-accent text-on-accent" : "bg-raised text-fg"
+      }`}
+    >
+      <Glyph className="size-6" name={glyph} />
+    </span>
+    {name}
+  </button>
+);
 
-const Deposit = ({ amount }: { amount: bigint }) => (
-  <Card>
-    <p className="tabular font-semibold">
-      Safety deposit {formatUsdt(amount)} USDT
-    </p>
-    <p className="text-muted mt-0.5 text-sm">
-      Still your money. It is why strangers trust your notes with no signal.
-    </p>
-  </Card>
+const TokenRow = ({
+  amount,
+  detail,
+  icon,
+  title,
+  tone = "",
+}: {
+  amount: string;
+  detail: string;
+  icon: ReactNode;
+  title: string;
+  tone?: string;
+}) => (
+  <li className="flex items-center gap-3 py-3">
+    {icon}
+    <div className="min-w-0 flex-1">
+      <p className="font-semibold">{title}</p>
+      <p className={`text-sm ${tone || "text-muted"}`}>{detail}</p>
+    </div>
+    <p className="tabular shrink-0 font-semibold">{amount}</p>
+  </li>
+);
+
+const Tokens = ({
+  deposit,
+  groups,
+}: {
+  deposit: bigint;
+  groups: readonly NoteGroup[];
+}) => (
+  <ul>
+    <TokenRow
+      amount={`${formatUsdt(groupsTotal(groups))} USDT`}
+      detail={
+        groups.length > 0
+          ? groups.map(groupLabel).join(", ")
+          : "No notes right now"
+      }
+      icon={<TokenIcon />}
+      title="USDT notes"
+    />
+    {deposit > 0n && (
+      <TokenRow
+        amount={`${formatUsdt(deposit)} USDT`}
+        detail="Still yours. It is why strangers trust your notes."
+        icon={
+          <RowIcon tone="text-accent">
+            <Glyph name="shield" />
+          </RowIcon>
+        }
+        title="Safety deposit"
+      />
+    )}
+  </ul>
 );
 
 const ActivityRow = ({ line }: { line: Activity }) => {
-  const { detail, sign, title, tone } = ACTIVITY[line.kind];
+  const { detail, glyph, sign, title, tone } = ACTIVITY[line.kind];
   return (
-    <li className="border-sand flex items-start justify-between gap-3 border-t py-3 first:border-t-0">
-      <div className="min-w-0">
+    <li className="flex items-center gap-3 py-3">
+      <RowIcon tone={tone}>
+        <Glyph name={glyph} />
+      </RowIcon>
+      <div className="min-w-0 flex-1">
         <p className="font-semibold">{title}</p>
         <p className="text-muted text-sm">
           {detail}{" "}
@@ -270,6 +328,77 @@ const ActivityRow = ({ line }: { line: Activity }) => {
   );
 };
 
+const shortAddress = (address: string): string =>
+  `${address.slice(0, ADDRESS_EDGE)}…${address.slice(-ADDRESS_EDGE + 2)}`;
+
+/** The crypto details live here, one tap away from a screen that needs none. */
+const AccountSheet = ({
+  address,
+  go,
+  onClose,
+  online,
+}: {
+  address: string;
+  go: (route: Route) => void;
+  onClose: () => void;
+  online: boolean;
+}) => {
+  const [copied, setCopied] = useState(false);
+  const copy = useCallback(async () => {
+    await navigator.clipboard.writeText(address);
+    setCopied(true);
+  }, [address]);
+  const explorer = whitechainSepolia.blockExplorers.default.url;
+  return (
+    <div className="fixed inset-0 z-10 flex flex-col justify-end">
+      <button
+        aria-label="Close"
+        className="absolute inset-0 bg-black/60"
+        onClick={onClose}
+        type="button"
+      />
+      <section className="animate-lift bg-surface relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-3xl px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center gap-3">
+          <Seal className="size-11" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold">Account</p>
+            <p className="text-muted tabular font-mono text-sm" data-address>
+              {shortAddress(address)}
+            </p>
+          </div>
+          <button
+            className="bg-raised rounded-full px-4 py-2 text-sm font-semibold"
+            onClick={copy}
+            type="button"
+          >
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+        <div className="border-line flex items-center justify-between border-t pt-4 text-sm">
+          <span className="text-muted">Network</span>
+          <span className="flex items-center gap-1.5 font-medium">
+            <span
+              className={`size-2 rounded-full ${online ? "bg-good" : "bg-muted"}`}
+            />
+            {whitechainSepolia.name}
+          </span>
+        </div>
+        <a
+          className="text-sm font-semibold underline"
+          href={`${explorer}/address/${address}`}
+          rel="noreferrer"
+          target="_blank"
+        >
+          View on explorer
+        </a>
+        <Button onClick={() => go("settings")} variant="plain">
+          Settings
+        </Button>
+      </section>
+    </div>
+  );
+};
+
 export const Home = ({
   go,
   online,
@@ -288,6 +417,8 @@ export const Home = ({
   const [busy, setBusy] = useState<"settling" | "syncing" | null>(null);
   const [problem, setProblem] = useState("");
   const [results, setResults] = useState<readonly SettleResult[]>([]);
+  const [tab, setTab] = useState<"activity" | "tokens">("tokens");
+  const [account, setAccount] = useState(false);
 
   const groups = noteGroups(view.notes);
   const received = receivedTotal(view.notes);
@@ -335,22 +466,39 @@ export const Home = ({
   return (
     <Page>
       <header className="flex items-center justify-between">
-        <span className="flex items-center gap-2 font-serif text-2xl font-semibold">
-          Hundi
-        </span>
+        <button
+          className="bg-surface border-line flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 font-semibold"
+          onClick={() => setAccount(true)}
+          type="button"
+        >
+          <Seal className="size-7" />
+          Account
+          <svg
+            aria-hidden="true"
+            className="text-muted size-4"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
         <div className="flex items-center gap-3">
           {online && (
             <span
-              className="text-leaf flex items-center gap-1.5 text-sm font-semibold"
+              className="text-good flex items-center gap-1.5 text-sm font-semibold"
               data-network="online"
             >
-              <span className="bg-leaf size-2 rounded-full" />
+              <span className="bg-good size-2 rounded-full" />
               Online
             </span>
           )}
           <button
             aria-label="Settings"
-            className="text-ink -mr-1 rounded-full p-1"
+            className="text-fg -mr-1 rounded-full p-1"
             onClick={() => go("settings")}
             type="button"
           >
@@ -377,15 +525,28 @@ export const Home = ({
         <Welcome go={go} />
       ) : (
         <>
-          <Balance groups={groups} />
-          <div className="grid grid-cols-2 gap-3">
-            <Button
+          <Balance total={groupsTotal(groups)} />
+          <div className="grid grid-cols-4">
+            <Action
+              glyph="up"
+              highlight={canSpend}
+              name="Pay"
               onClick={() => go("pay")}
-              variant={canSpend ? "primary" : "plain"}
-            >
-              Pay
-            </Button>
-            <Button onClick={() => go("receive")}>Receive</Button>
+            />
+            <Action glyph="down" name="Receive" onClick={() => go("receive")} />
+            <Action
+              glyph="plus"
+              label="Add money"
+              name="Add"
+              onClick={() => go("add")}
+            />
+            <Action
+              disabled={!(online && received > 0n)}
+              glyph="check"
+              highlight={online && received > 0n}
+              name="Settle"
+              onClick={settle}
+            />
           </div>
         </>
       )}
@@ -400,36 +561,52 @@ export const Home = ({
           <p className="font-semibold">
             You received {formatUsdt(received)} USDT
           </p>
-          <p className="text-muted mt-0.5 mb-3 text-sm">
+          <p className="text-muted mt-0.5 text-sm">
             {online
               ? "Settle to cash it out, or spend it on."
               : "Settle when you have signal. Your notes are safe here."}
           </p>
-          <Button disabled={!online} onClick={settle}>
-            Settle
-          </Button>
         </Card>
       )}
 
-      {view.deposit > 0n && <Deposit amount={view.deposit} />}
-
-      {lines.length > 0 && (
+      {!fresh && (
         <section>
-          <h2 className="font-serif text-xl font-semibold">Activity</h2>
-          <ul className="mt-1">
-            {lines.map((line) => (
-              <ActivityRow key={line.id} line={line} />
+          <div className="border-line flex gap-6 border-b" role="tablist">
+            {(["tokens", "activity"] as const).map((name) => (
+              <button
+                aria-selected={tab === name}
+                className={`-mb-px border-b-2 pb-2 font-semibold capitalize ${
+                  tab === name
+                    ? "border-accent text-fg"
+                    : "text-muted border-transparent"
+                }`}
+                key={name}
+                onClick={() => setTab(name)}
+                role="tab"
+                type="button"
+              >
+                {name}
+              </button>
             ))}
-          </ul>
+          </div>
+          {tab === "tokens" ? (
+            <Tokens deposit={view.deposit} groups={groups} />
+          ) : (
+            <ul>
+              {lines.map((line) => (
+                <ActivityRow key={line.id} line={line} />
+              ))}
+              {lines.length === 0 && (
+                <li className="text-muted py-6 text-center text-sm">
+                  Nothing yet. Your payments show up here.
+                </li>
+              )}
+            </ul>
+          )}
         </section>
       )}
 
-      <footer className="mt-auto flex flex-col gap-3">
-        {!fresh && (
-          <Button onClick={() => go("add")} variant="plain">
-            Add money
-          </Button>
-        )}
+      <footer className="mt-auto">
         <p className="text-muted text-center text-sm">
           {syncedLabel(view.syncedAt)}
           {online && (
@@ -447,6 +624,15 @@ export const Home = ({
           )}
         </p>
       </footer>
+
+      {account && (
+        <AccountSheet
+          address={wallet.address}
+          go={go}
+          onClose={() => setAccount(false)}
+          online={online}
+        />
+      )}
     </Page>
   );
 };

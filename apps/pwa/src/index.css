@@ -1,15 +1,26 @@
 @import "tailwindcss";
 
 @theme {
-  --color-ink: #1a2133;
-  --color-muted: #5c6270;
-  --color-paper: #f1e9da;
-  --color-card: #fcf8ee;
-  --color-sand: #e0d4bd;
-  --color-indigo: #25316b;
-  --color-leaf: #17694a;
-  --color-clay: #b4321d;
-  --color-gold: #8a5a0c;
+  --color-base: #0d1014;
+  --color-surface: #171b22;
+  --color-raised: #222833;
+  --color-line: #2c3340;
+  --color-fg: #f3f5f8;
+  --color-muted: #9aa3b2;
+  --color-accent: #f5b83d;
+  --color-on-accent: #1a1405;
+  --color-good: #3ddc97;
+  --color-bad: #ff6b5e;
+  --color-warn: #f5b83d;
+  --color-tether: #26a17b;
+
+  /* The verdict is the one printed thing left: a paper note and a rubber stamp. */
+  --color-note-paper: #fcf8ee;
+  --color-note-ink: #1a2133;
+  --color-note-muted: #5c6270;
+  --color-note-rule: #e0d4bd;
+  --color-stamp-ok: #17694a;
+  --color-stamp-bad: #b4321d;
 
   --font-serif:
     ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, "Noto Serif",
@@ -98,9 +109,9 @@
 
 html,
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  color-scheme: light;
+  background: var(--color-base);
+  color: var(--color-fg);
+  color-scheme: dark;
   overscroll-behavior: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -112,7 +123,7 @@ body {
 /* A printed instrument: paper, a hairline frame inset from the edge. */
 .note {
   position: relative;
-  background: var(--color-card);
+  background: var(--color-note-paper);
   border-radius: 0.5rem;
   box-shadow:
     0 0 0 1px rgb(26 33 51 / 0.1),
@@ -124,27 +135,8 @@ body {
   inset: 0.4rem;
   pointer-events: none;
   content: "";
-  border: 1px solid var(--color-sand);
+  border: 1px solid var(--color-note-rule);
   border-radius: 0.25rem;
-}
-
-.note-blank {
-  outline: 1.5px dashed var(--color-sand);
-  background: transparent;
-  box-shadow: none;
-}
-
-.note-blank::after {
-  display: none;
-}
-
-/* The sheets under the top note, one per extra note in the stack. */
-.note-sheet {
-  position: absolute;
-  inset: 0;
-  background: var(--color-card);
-  border-radius: 0.5rem;
-  box-shadow: 0 0 0 1px rgb(26 33 51 / 0.12);
 }
 
 .stamp {

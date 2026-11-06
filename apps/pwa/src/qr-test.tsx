@@ -357,7 +357,7 @@ export const QrTest = () => {
   const storage = usePersistentStorage();
 
   return (
-    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 p-4">
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col gap-4 bg-white p-4 text-black">
       <h1 className="text-2xl font-bold">Hundi QR test</h1>
       <div className="flex gap-2">
         <Choice

@@ -3,7 +3,7 @@ import type { PayRequest } from "@hundi/core/types";
 import { formatUsdt, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useState } from "react";
 import { Failure } from "./moments";
-import { Button, Camera, Note, Notice, QrCode, Screen } from "./ui";
+import { Button, Camera, Notice, QrCode, Screen, TokenIcon } from "./ui";
 
 type Step =
   | { kind: "scan" }
@@ -86,7 +86,7 @@ export const Pay = ({
     return (
       <Screen onBack={onDone} title="Show this to them">
         <QrCode bytes={step.bytes} />
-        <p className="tabular text-center font-serif text-4xl font-semibold">
+        <p className="tabular text-center text-4xl font-semibold">
           {formatUsdt(step.amount)} USDT
         </p>
         <p className="text-muted text-center">
@@ -103,15 +103,12 @@ export const Pay = ({
     const { amount } = step.request;
     return (
       <Screen onBack={onDone} title="Pay">
-        <div className="animate-lift mt-6">
-          <Note>
-            <div className="py-6 text-center">
-              <p className="text-muted">You are paying</p>
-              <p className="tabular mt-1 font-serif text-6xl font-semibold">
-                {amount === 0n ? "One note" : `${formatUsdt(amount)} USDT`}
-              </p>
-            </div>
-          </Note>
+        <div className="animate-lift bg-surface border-line mt-6 flex flex-col items-center gap-2 rounded-2xl border px-5 py-8 text-center">
+          <TokenIcon className="size-12" />
+          <p className="text-muted mt-1">You are paying</p>
+          <p className="tabular text-5xl font-semibold tracking-tight">
+            {amount === 0n ? "One note" : `${formatUsdt(amount)} USDT`}
+          </p>
         </div>
         <p className="text-muted text-center">
           One whole note leaves your phone. It works with no signal.

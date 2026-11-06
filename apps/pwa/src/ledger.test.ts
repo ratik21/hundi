@@ -5,6 +5,7 @@ import type { SettleResult } from "@hundi/wallet/wallet";
 import type { Hex } from "viem";
 import {
   activityOf,
+  dollars,
   groupsTotal,
   noteGroups,
   receivedTotal,
@@ -119,5 +120,14 @@ describe("settleSummary", () => {
   test("nothing paid is either a failure or old news", () => {
     expect(settleSummary([failed]).word).toBe("Not settled");
     expect(settleSummary([already]).word).toBe("Already paid");
+  });
+});
+
+describe("dollars", () => {
+  test("shows whole and part dollars to the cent", () => {
+    expect(dollars(0n)).toBe("$0.00");
+    expect(dollars(10_000_000n)).toBe("$10.00");
+    expect(dollars(4_900_000n)).toBe("$4.90");
+    expect(dollars(50_000n)).toBe("$0.05");
   });
 });
