@@ -4,80 +4,119 @@
 <meta charset="utf-8">
 <title>How Hundi works</title>
 <style>
-  :root { --base:#0d1014; --surface:#171b22; --line:#2c3340; --fg:#f3f5f8; --muted:#9aa3b2; --accent:#f5b83d; --good:#3ddc97; --bad:#ff6b5e; }
-  * { box-sizing:border-box; margin:0; }
-  html,body { background:var(--base); }
-  body { width:1360px; color:var(--fg); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif; }
-  .panel { padding:30px 44px 34px; }
-  section { display:grid; grid-template-columns:150px 1fr; align-items:center; gap:18px; padding:30px 0; }
-  section + section { border-top:1px solid var(--line); }
-  h2 { font-size:32px; line-height:1.15; font-weight:700; }
-  h2 small { display:block; color:var(--muted); font-size:16px; font-weight:500; margin-top:8px; line-height:1.3; }
-  .flow { display:flex; align-items:center; }
-  .pair { display:flex; justify-content:center; }
-  .pair .dot { margin:0 0 12px; }
-  .pair .dot + .dot { margin-left:-22px; }
-  .who { width:118px; flex:none; text-align:center; }
-  .dot { width:88px; height:88px; margin:0 auto 12px; border-radius:50%; display:grid; place-items:center; font-size:34px; font-weight:700; background:var(--surface); border:2px solid var(--line); }
-  .who.wide { width:190px; }
-  .who b { display:block; font-size:26px; font-weight:600; }
-  .who span { display:block; color:var(--muted); font-size:21px; margin-top:2px; }
-  .chain .dot { background:var(--accent); border-color:var(--accent); color:#1a1405; font-size:38px; }
-  .cheat .dot { border-color:var(--bad); color:var(--bad); }
-  .link { flex:1; min-width:100px; height:100px; position:relative; text-align:center; padding:0 10px; }
-  .link p { font-size:25px; font-weight:600; min-height:32px; white-space:nowrap; }
-  .link em { display:block; font-style:normal; color:var(--muted); font-size:21px; position:absolute; inset-inline:0; top:54px; white-space:nowrap; }
-  .arrow { position:absolute; left:6px; right:6px; top:42px; height:3px; background:var(--accent); border-radius:2px; }
-  .arrow::after { content:""; position:absolute; right:-1px; top:-7px; border-left:15px solid var(--accent); border-top:8.5px solid transparent; border-bottom:8.5px solid transparent; }
-  .off .arrow { background:repeating-linear-gradient(90deg,var(--line) 0 12px,transparent 12px 22px); }
-  .off .arrow::after { display:none; }
-  .off p { color:var(--bad); }
-  .off .arrow { top:70px; }
-  .x { position:absolute; left:50%; top:71px; transform:translate(-50%,-50%); width:46px; height:46px; border-radius:50%; background:var(--base); border:2px solid var(--bad); color:var(--bad); display:grid; place-items:center; font-size:26px; font-weight:700; }
-  .result { width:290px; flex:none; margin-left:18px; padding:14px 18px; border-radius:14px; font-size:24px; font-weight:600; line-height:1.35; background:var(--surface); border:1px solid var(--line); }
-  .result small { display:block; color:var(--muted); font-size:20px; font-weight:400; margin-top:6px; }
-  .result.bad { color:var(--bad); }
-  .result.good { color:var(--good); }
-  .result.good small, .result.bad small { color:var(--muted); }
-  .fork { flex:1; display:grid; gap:18px; }
-  .fork .flow { min-height:112px; }
-  .cheatrow { display:flex; align-items:center; flex:1; }
+  :root { --ink:#111; --paper:#fff; --soft:#555; --bad:#c8321e; --good:#147a52; --seal:#f5b83d; --seal-ink:#1a1405; }
+  html.dark { --ink:#f3f5f8; --paper:#0d1117; --soft:#9aa3b2; --bad:#ff7b6b; --good:#3ddc97; }
+  * { margin:0; }
+  html,body { background:var(--paper); }
+  svg { display:block; font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif; fill:var(--ink); }
+  .h { font-size:38px; font-weight:700; }
+  .l { font-size:27px; font-weight:400; text-anchor:middle; }
+  .s { font-size:21px; font-weight:400; fill:var(--soft); text-anchor:middle; }
+  .n { font-size:26px; font-weight:500; text-anchor:middle; }
+  .line { fill:none; stroke:var(--ink); stroke-width:4.5; stroke-linecap:round; stroke-linejoin:round; }
+  .rule { stroke:var(--ink); stroke-width:6; }
+  .o { fill:var(--paper); stroke:var(--ink); stroke-width:3.5; }
+  .ink { fill:var(--ink); stroke:none; }
+  .pap { fill:var(--paper); stroke:var(--ink); stroke-width:3; }
+  .thin { fill:none; stroke:var(--ink); stroke-width:3; stroke-linecap:round; }
+  .bad { fill:var(--bad); } .good { fill:var(--good); }
+  .xs { fill:none; stroke:var(--bad); stroke-width:5.5; stroke-linecap:round; }
 </style>
 </head>
 <body>
-<div class="panel">
-  <section>
-    <h2>Without Hundi</h2>
-    <div class="flow">
-      <div class="who"><div class="dot">A</div><b>Alice</b><span>customer</span></div>
-      <div class="link off"><p>Network down</p><div class="arrow"></div><div class="x">✕</div></div>
-      <div class="who"><div class="dot">B</div><b>Bob</b><span>merchant</span></div>
-      <div class="result bad">The payment fails<small>Digital money stops with the network.</small></div>
-    </div>
-  </section>
-  <section>
-    <h2>With Hundi</h2>
-    <div class="flow">
-      <div class="who"><div class="dot">A</div><b>Alice</b><span>customer</span></div>
-      <div class="link"><p>Pays by QR</p><div class="arrow"></div><em>no network</em></div>
-      <div class="who"><div class="dot">B</div><b>Bob</b><span>merchant</span></div>
-      <div class="link"><p>Spends it on</p><div class="arrow"></div><em>still no network</em></div>
-      <div class="who"><div class="dot">C</div><b>Carol</b><span>supplier</span></div>
-      <div class="link"><p>Claims</p><div class="arrow"></div><em>once online</em></div>
-      <div class="who chain"><div class="dot">₮</div><b>USDT</b><span>on-chain</span></div>
-    </div>
-  </section>
-  <section>
-    <h2>If someone cheats</h2>
-    <div class="flow">
-      <div class="who cheat"><div class="dot">M</div><b>Mallory</b><span>cheater</span></div>
-      <div class="link"><p>Pays both</p><div class="arrow"></div><em>same money</em></div>
-      <div class="who wide" style="width:150px"><div class="pair"><div class="dot">B</div><div class="dot">C</div></div><b>Bob, Carol</b><span>both accept</span></div>
-      <div class="link"><p>Both claim</p><div class="arrow"></div><em>once online</em></div>
-      <div class="who chain"><div class="dot">₮</div><b>USDT</b><span>on-chain</span></div>
-      <div class="result good">Two signatures prove it<small>Both are paid. Mallory's deposit loses double.</small></div>
-    </div>
-  </section>
-</div>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1060" width="1500" height="1060">
+  <defs>
+    <marker id="a" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1l9 5-9 5" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <clipPath id="c"><circle r="56"/></clipPath>
+
+    <g id="alice"><circle class="o" r="56"/><g clip-path="url(#c)">
+      <path class="ink" d="M-33 60c-7-30-6-58-3-74 3-20 18-30 36-30s33 10 36 30c3 16 4 44-3 74z"/>
+      <path class="pap" d="M-38 62c3-16 18-22 38-22s35 6 38 22z"/>
+      <path class="pap" d="M-11 24h22v20c-6 6-16 6-22 0z"/>
+      <ellipse class="pap" cy="4" rx="22" ry="26"/>
+      <path class="ink" d="M-23-6c5-3 12-13 13-20 8 10 22 14 33 15 0-15-10-27-23-27s-24 14-23 32z"/>
+      <circle class="ink" cx="-9" cy="4" r="2.8"/><circle class="ink" cx="9" cy="4" r="2.8"/>
+      <path class="thin" d="M-6 15c3 3 9 3 12 0"/>
+    </g></g>
+
+    <g id="bob"><circle class="o" r="56"/><g clip-path="url(#c)">
+      <path class="ink" d="M-44 62c2-20 24-26 44-26s42 6 44 26z"/>
+      <path class="pap" d="M-16 30l16 16 16-16z"/>
+      <path class="pap" d="M-11 22h22v14c-6 8-16 8-22 0z"/>
+      <ellipse class="pap" cy="2" rx="23" ry="27"/>
+      <path class="ink" d="M-24-6c-4-22 8-32 22-33 4-4 14-4 18 2 10 4 12 18 8 31-3-7-8-11-13-12-10 3-24 2-31 0-2 3-3 7-4 12z"/>
+      <circle class="ink" cx="-9" cy="3" r="2.8"/><circle class="ink" cx="9" cy="3" r="2.8"/>
+      <path class="thin" d="M-7 14c4 4 10 4 14 0"/>
+    </g></g>
+
+    <g id="carol"><circle class="o" r="56"/><g clip-path="url(#c)">
+      <circle class="ink" cy="-40" r="13"/>
+      <path class="pap" d="M-42 62c3-18 20-24 42-24s39 6 42 24z"/>
+      <path class="pap" d="M-11 22h22v18c-6 7-16 7-22 0z"/>
+      <ellipse class="pap" cy="3" rx="23" ry="27"/>
+      <path class="ink" d="M-24 2c-4-18 8-32 24-32s28 14 24 32c-2-8-8-14-15-17-10 4-22 6-29 4-2 4-3 8-4 13z"/>
+      <circle class="thin" cx="-10" cy="5" r="7.5"/><circle class="thin" cx="10" cy="5" r="7.5"/><path class="thin" d="M-2.5 5h5"/>
+      <circle class="ink" cx="-10" cy="5" r="2.4"/><circle class="ink" cx="10" cy="5" r="2.4"/>
+      <path class="thin" d="M-6 18c3 3 9 3 12 0"/>
+    </g></g>
+
+    <g id="mallory"><circle class="o" r="56"/><g clip-path="url(#c)">
+      <path class="ink" d="M-46 62c3-20 25-27 46-27s43 7 46 27z"/>
+      <path class="pap" d="M-11 22h22v14c-6 7-16 7-22 0z"/>
+      <ellipse class="pap" cy="3" rx="23" ry="27"/>
+      <path class="ink" d="M-26-10c-2-20 10-32 26-32s28 12 26 32c-14-5-38-5-52 0z"/>
+      <path class="ink" d="M-26-3c9-4 18-1 26 3 8-4 17-7 26-3 1 8-1 13-5 15-9 3-15-1-21-6-6 5-12 9-21 6-4-2-6-7-5-15z"/>
+      <circle class="pap" cx="-12" cy="4" r="3.6"/><circle class="pap" cx="12" cy="4" r="3.6"/>
+      <path class="thin" d="M-7 19c4-3 10-3 14 0"/>
+    </g></g>
+
+    <g id="vault"><circle r="56" fill="var(--seal)" stroke="var(--ink)" stroke-width="3.5"/>
+      <text text-anchor="middle" dominant-baseline="central" font-size="50" font-weight="700" fill="var(--seal-ink)" y="-1">हुं</text>
+    </g>
+  </defs>
+
+  <text class="h" x="30" y="66">Without</text><text class="h" x="30" y="112">Hundi</text>
+  <use href="#alice" x="540" y="120"/><text class="n" x="540" y="214">Alice</text>
+  <path class="line" d="M612 120H888" marker-end="url(#a)"/>
+  <text class="l" x="750" y="84">Pays</text>
+  <circle cx="750" cy="120" r="23" fill="var(--paper)"/><path class="xs" d="M738 108l24 24M762 108l-24 24"/>
+  <text class="s" x="750" y="172">network down</text>
+  <use href="#bob" x="960" y="120"/><text class="n" x="960" y="214">Bob</text>
+  <text class="l bad" x="1240" y="128" style="font-weight:600">The payment fails</text>
+
+  <path class="rule" d="M30 262H1470"/>
+
+  <text class="h" x="30" y="330">With</text><text class="h" x="30" y="376">Hundi</text>
+  <use href="#alice" x="300" y="420"/><text class="n" x="300" y="514">Alice</text>
+  <path class="line" d="M372 420H588" marker-end="url(#a)"/>
+  <text class="l" x="480" y="396">Pays by QR</text><text class="s" x="480" y="458">no network</text>
+  <use href="#bob" x="660" y="420"/><text class="n" x="660" y="514">Bob</text><text class="s" x="660" y="544">merchant</text>
+  <path class="line" d="M732 420H948" marker-end="url(#a)"/>
+  <text class="l" x="840" y="396">Spends it on</text><text class="s" x="840" y="458">still no network</text>
+  <use href="#carol" x="1020" y="420"/><text class="n" x="1020" y="514">Carol</text><text class="s" x="1020" y="544">supplier</text>
+  <path class="line" d="M1092 420H1308" marker-end="url(#a)"/>
+  <text class="l" x="1200" y="396">Claims</text><text class="s" x="1200" y="458">once online</text>
+  <use href="#vault" x="1380" y="420"/><text class="n" x="1380" y="514">Real USDT</text><text class="s" x="1380" y="544">on-chain</text>
+
+  <path class="rule" d="M30 586H1470"/>
+
+  <text class="h" x="30" y="654">If someone</text><text class="h" x="30" y="700">cheats</text>
+  <use href="#mallory" x="300" y="820"/><text class="n" x="300" y="914">Mallory</text>
+  <path class="line" d="M372 820H505"/>
+  <path class="line" d="M505 820L588 736" marker-end="url(#a)"/>
+  <path class="line" d="M505 820L588 904" marker-end="url(#a)"/>
+  <text class="l" x="436" y="798">Same money</text>
+  <use href="#bob" x="660" y="690"/><text class="n" x="750" y="698" style="text-anchor:start">Bob</text>
+  <use href="#carol" x="660" y="950"/><text class="n" x="750" y="958" style="text-anchor:start">Carol</text>
+  <path class="line" d="M824 722L960 800" marker-end="url(#a)"/>
+  <path class="line" d="M824 918L960 840" marker-end="url(#a)"/>
+  <text class="l" x="900" y="832" style="text-anchor:end">Both claim</text>
+  <use href="#vault" x="1030" y="820"/>
+  <path class="line" d="M1102 820H1178" marker-end="url(#a)"/>
+  <text class="l good" x="1312" y="790" style="font-weight:600">Two signatures</text>
+  <text class="l good" x="1312" y="824" style="font-weight:600">prove the cheat</text>
+  <text class="s" x="1312" y="862">Bob and Carol get paid.</text>
+  <text class="s" x="1312" y="892">Mallory's deposit loses double.</text>
+</svg>
 </body>
 </html>

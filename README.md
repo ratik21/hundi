@@ -9,8 +9,13 @@
     <a href="https://explorer.testnet.whitechain.io/address/0x422d3a4745cfdeb1be99772ef636e827c892c45a">Contract</a> ·
     <a href="docs/HOW-IT-WORKS.md">How it works in detail</a>
   </p>
-  <img src="docs/assets/screens.png" alt="Hundi on an iPhone: balance, offline mode, a paid stamp and a refused stamp">
 </div>
+
+<p align="center">
+  <img src="docs/assets/phone-balance.png" width="31%" alt="Hundi home screen showing a 10 dollar balance">
+  <img src="docs/assets/phone-offline.png" width="31%" alt="Hundi offline, with 5 USDT pending">
+  <img src="docs/assets/phone-paid.png" width="31%" alt="A green screen with a Paid stamp, checked with no network">
+</p>
 
 Built at ETHGlobal Mumbai 2026. Everything runs on the Whitechain Sepolia testnet, chain 1874, so no real money moves.
 
@@ -24,7 +29,10 @@ Merchants in India solved this centuries ago with the hundi, a paper note that p
 
 ## How it works
 
-<img src="docs/assets/how-it-works.png" alt="Without Hundi, a payment fails when the network is down. With Hundi, Alice pays Bob by QR, Bob spends it on to Carol, and Carol claims USDT once online. If Mallory pays Bob and Carol with the same money, both claim, and her deposit loses double.">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-it-works-dark.png">
+  <img src="docs/assets/how-it-works.png" alt="Without Hundi, a payment fails when the network is down. With Hundi, Alice pays Bob by QR, Bob spends it on to Carol, and Carol claims USDT once online. If Mallory pays Bob and Carol with the same money, both claim, and her deposit loses double.">
+</picture>
 
 Alice added USDT and a safety deposit while online. Now she wants a chai from Bob, and nobody has signal.
 

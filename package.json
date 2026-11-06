@@ -13,6 +13,7 @@
     "fix": "ultracite fix",
     "lab": "scripts/lab/up.sh",
     "lab:drive": "browser-harness < scripts/lab/drive.py",
+    "lab:readme": "browser-harness < scripts/lab/readme-shots.py",
     "lab:shop": "browser-harness < scripts/lab/drive-shop.py",
     "lab:sim": "python3 scripts/lab/sim-drive.py",
     "relayer": "scripts/relayer-deploy.sh",
