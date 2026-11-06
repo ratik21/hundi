@@ -11,7 +11,7 @@ Everything runs on the Whitechain Sepolia testnet, chain 1874.
 - `HundiVault`, verified: [0x422D3a4745CFDEb1be99772eF636E827C892c45A](https://explorer.testnet.whitechain.io/address/0x422d3a4745cfdeb1be99772ef636e827c892c45a)
 - First settlement, 5 USDT out of the vault to `payTo`: [0x4fa1...ebab](https://explorer.testnet.whitechain.io/tx/0x4fa116315edde176eb4c8d5e0a39998f21e8791afb5bb9b2958ba3412e74ebab)
 - Settled through the relayer by a device holding no gas: [0x6724...ac66](https://explorer.testnet.whitechain.io/tx/0x6724decba19824a653c94e8557e3d106fcc4fdf94f18ed9667825cb0c257ac66)
-- Settled directly with the relayer stopped: [0xaee9...caa8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8)
+- Settled directly with the relayer stopped: [0xaee9...bca8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8)
 - Wallet: <https://hundi-ten.vercel.app>
 
 ## Relayer

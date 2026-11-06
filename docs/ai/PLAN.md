@@ -246,7 +246,7 @@ ETHGlobal removes a project with no live deployment from finalist judging.
 **You see.**
 
 - [x] A device with no WBT settles through the relayer. Evidence is [0x6724...ac66](https://explorer.testnet.whitechain.io/tx/0x6724decba19824a653c94e8557e3d106fcc4fdf94f18ed9667825cb0c257ac66).
-- [x] With the relayer stopped, the app settles directly through **Submit directly**. Evidence is [0xaee9...caa8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8).
+- [x] With the relayer stopped, the app settles directly through **Submit directly**. Evidence is [0xaee9...bca8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8).
 
 ## Build the drop-in widget (U7)
 
