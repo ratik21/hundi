@@ -1,5 +1,6 @@
 import jsQR from "jsqr";
 import QRCode from "qrcode";
+import { LAB_URL, showLabQr } from "./lab";
 
 export interface QrImage {
   height: number;
@@ -51,6 +52,9 @@ export const drawQr = (
   bytes: Uint8Array,
   maxDevicePixels: number
 ): number => {
+  if (LAB_URL) {
+    showLabQr(bytes);
+  }
   const scale = Math.max(1, Math.floor(maxDevicePixels / qrWidth(bytes)));
   const { height, pixels, width } = renderQr(bytes, scale);
   canvas.width = width;

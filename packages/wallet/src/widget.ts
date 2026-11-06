@@ -8,6 +8,7 @@ import type { PayRequest, UsdtAtoms, Verdict } from "@hundi/core/types";
 import { parseUnits } from "viem";
 import { createReads, createWrites, relayerFrom } from "./chain-io";
 import { settlementCsv } from "./csv";
+import { fundLabWallet, LAB_URL } from "./lab";
 import { REJECT_MESSAGES } from "./messages";
 import { drawQr } from "./qr";
 import { createDecoder, startScan } from "./scanner";
@@ -294,6 +295,9 @@ export const mountHundi = async (
     ),
     writes: createWrites(rpc),
   });
+  if (LAB_URL) {
+    await fundLabWallet(wallet.address);
+  }
   if (navigator.onLine) {
     await wallet.sync().catch(() => undefined);
   }

@@ -1,4 +1,5 @@
 import type { Bytes } from "./keystore";
+import { LAB_URL, takeLabQr } from "./lab";
 import type { QrImage } from "./qr";
 
 export interface Decoder {
@@ -69,13 +70,36 @@ const openCamera = (): Promise<MediaStream> =>
     },
   });
 
+const LAB_POLL_MS = 300;
+
+const startLabScan = ({ onCamera, onScan }: ScanOptions): (() => void) => {
+  let stopped = false;
+  const startedAt = performance.now();
+  const poll = async () => {
+    const bytes = await takeLabQr().catch(() => null);
+    if (stopped) {
+      return;
+    }
+    if (bytes) {
+      const milliseconds = Math.round(performance.now() - startedAt);
+      onScan({ bytes, frames: 1, milliseconds });
+      return;
+    }
+    setTimeout(poll, LAB_POLL_MS);
+  };
+  onCamera("lab");
+  poll();
+  return () => {
+    stopped = true;
+  };
+};
+
 /** Returns a function that stops the camera. */
-export const startScan = ({
-  onCamera,
-  onError,
-  onScan,
-  video,
-}: ScanOptions): (() => void) => {
+export const startScan = (options: ScanOptions): (() => void) => {
+  if (LAB_URL) {
+    return startLabScan(options);
+  }
+  const { onCamera, onError, onScan, video } = options;
   const decoder = createDecoder();
   const context = document
     .createElement("canvas")

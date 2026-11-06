@@ -1,3 +1,4 @@
+import { fundLabWallet, LAB_URL } from "@hundi/wallet/lab";
 import type { NoteRecord, Settings } from "@hundi/wallet/store";
 import { openWallet, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useEffect, useState } from "react";
@@ -51,6 +52,9 @@ export const useWallet = () => {
           relayer: relayerUrl,
           writes,
         });
+        if (LAB_URL) {
+          await fundLabWallet(opened.address);
+        }
         await navigator.storage?.persist?.();
         setView(await readView(opened));
         setWallet(opened);

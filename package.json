@@ -11,6 +11,8 @@
     "build": "bun run --filter '@hundi/pwa' build && bun run --filter '@hundi/shop' build",
     "check": "ultracite check",
     "fix": "ultracite fix",
+    "lab": "scripts/lab/up.sh",
+    "lab:drive": "browser-harness < scripts/lab/drive.py",
     "relayer": "scripts/relayer-up.sh",
     "test": "bun test packages apps",
     "typecheck": "tsc --noEmit"
