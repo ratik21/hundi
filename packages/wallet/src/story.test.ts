@@ -225,6 +225,25 @@ describe.skipIf(!anvil)("Appendix F story", () => {
     expect(facts.filter((note) => note.settled).length).toBeGreaterThan(1);
   }, 120_000);
 
+  test("a load shows on this device even when the RPC head lags a block", async () => {
+    const lagging = {
+      ...reads,
+      getBlockNumber: async () =>
+        (await reads.getBlockNumber({ cacheTime: 0 })) - 1n,
+    } as PublicClient;
+    const customer = await openWallet({
+      device: await deviceKeyFrom(await generateKeyPair()),
+      reads: lagging,
+      store: memoryStore(),
+      writes: transport,
+    });
+    await fund(customer, usdt(15));
+
+    await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+
+    expect(await customer.deposit()).toBe(usdt(10));
+  }, 120_000);
+
   test("settle is idempotent after a lost reply", async () => {
     const customer = await newWallet();
     const stallStore = memoryStore();
