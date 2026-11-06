@@ -187,17 +187,22 @@ export const openWallet = async (options: WalletOptions) => {
   const signRaw = async (message: Uint8Array) =>
     splitSignature(bytesToHex(await device.sign(message as Bytes)));
 
+  let confirmedBlock = 0n;
+
   const confirmed = async (hash: Hex) => {
     const receipt = await reads.waitForTransactionReceipt({ hash });
     if (receipt.status !== "success") {
       throw new Error("Transaction reverted");
     }
+    confirmedBlock = receipt.blockNumber;
     return receipt;
   };
 
   const sync = async (): Promise<Snapshot> => {
     const from = ((await store.read("syncedBlock")) ?? DEPLOY_BLOCK - 1n) + 1n;
-    const to = await reads.getBlockNumber();
+    // The RPC head can trail a transaction this device just saw confirmed.
+    const head = await reads.getBlockNumber({ cacheTime: 0 });
+    const to = head > confirmedBlock ? head : confirmedBlock;
     const events = await readEvents(reads, from, to);
     const next = applyEvents(await snapshot(), events, now());
     await store.write("snapshot", next);
