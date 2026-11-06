@@ -3,7 +3,8 @@ import { type Bytes, keyFingerprint } from "@hundi/wallet/keystore";
 import type { Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useEffect, useState } from "react";
 import { concatHex, hexToBytes, isAddress } from "viem";
-import { Button, Card, Notice, Screen } from "./ui";
+import { TAGLINE } from "./pledges";
+import { Button, Card, Notice, PledgeRows, Screen } from "./ui";
 import type { WalletView } from "./use-wallet";
 
 const Switch = ({
@@ -122,6 +123,12 @@ export const Settings = ({
             {saved ? "Saved" : "Save"}
           </Button>
         </div>
+      </Card>
+
+      <Card>
+        <h2 className="font-semibold">What Hundi stands for</h2>
+        <p className="text-muted mt-0.5 mb-4 text-sm">{TAGLINE}</p>
+        <PledgeRows />
       </Card>
 
       <details className="border-line bg-surface rounded-xl border p-4">
