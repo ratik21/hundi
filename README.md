@@ -29,10 +29,7 @@ Merchants in India solved this centuries ago with the hundi, a paper note that p
 
 ## How it works
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/how-it-works-dark.png">
-  <img src="docs/assets/how-it-works.png" alt="Without Hundi, a payment fails when the network is down. With Hundi, Alice pays Bob by QR, Bob spends it on to Carol, and Carol claims USDT once online. If Mallory pays Bob and Carol with the same money, both claim, and her deposit loses double.">
-</picture>
+<img src="docs/assets/how-it-works.png" alt="Without Hundi, a payment fails when the network is down. With Hundi, Alice pays Bob by QR, Bob spends it on to Carol, and Carol claims USDT once online. If Mallory pays Bob and Carol with the same money, both claim, and her deposit loses double.">
 
 Alice added USDT and a safety deposit while online. Now she wants a chai from Bob, and nobody has signal.
 
