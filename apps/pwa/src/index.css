@@ -1,6 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ink: #13261d;
+  --color-muted: #5f6f66;
+  --color-paper: #f6f0e4;
+  --color-card: #fffbf2;
+  --color-sand: #e6dcc8;
+  --color-leaf: #1c6b49;
+  --color-clay: #b23c2a;
+  --color-gold: #b7791f;
+}
+
+html,
 body {
-  color: #111111;
-  background: #ffffff;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

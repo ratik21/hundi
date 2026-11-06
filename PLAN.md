@@ -188,7 +188,7 @@ If 618 bytes fails to scan, lower `MAX_HOPS` to 2, which gives 362 bytes. The de
 - [x] Implement `load`, `sync`, `request`, `pay`, `receive` and `settle`.
 - [x] Mark a note `offered` before showing its QR. An offered note can only re-show the same hop.
 - [x] Make `settle` idempotent. It reads the chain first, and reports `already` for finished work.
-- [ ] Test `eth_getLogs` through Anon-RPC now, before building on it. Evidence is a saved log. If it fails, follow the fallback in U8.
+- [x] Test `eth_getLogs` through Anon-RPC now, before building on it. Evidence is a saved log. If it fails, follow the fallback in U8. Failed on 6 Nov: the gateway did not answer. See `docs/ai/evidence/anon-rpc-getlogs.md`.
 - [x] Generate a secp256k1 funding key in the app for EIP-3009 and as the default payout address. Sign the USDT authorization with `USDT_DOMAIN`.
 
 **Verify.**
@@ -206,16 +206,16 @@ If 618 bytes fails to scan, lower `MAX_HOPS` to 2, which gives 362 bytes. The de
 
 **Files.**
 
-- [ ] Create the screens **Home**, **Add money**, **Pay**, **Receive** and **Settings** in `apps/pwa/src/`.
+- [x] Create the screens **Home**, **Add money**, **Pay**, **Receive** and **Settings** in `apps/pwa/src/`.
 
 **Build.**
 
-- [ ] **Home** shows the balance, held notes, and a clear online or offline badge.
-- [ ] **Pay** scans the payee's QR, confirms the amount, and shows the payment QR.
-- [ ] **Receive** shows the request QR, scans the payment, and shows a large green or red verdict with the reason.
-- [ ] **Settings** shows the payout address, a **Submit directly** switch, and the visible toggle **Demo: disable double-spend guard**.
-- [ ] Hide all crypto language from the main flow. Show "5 USDT", "Paid", "Covered". No gas, hashes or chain names.
-- [ ] After settlement, show a link to the explorer.
+- [x] **Home** shows the balance, held notes, and a clear online or offline badge.
+- [x] **Pay** scans the payee's QR, confirms the amount, and shows the payment QR.
+- [x] **Receive** shows the request QR, scans the payment, and shows a large green or red verdict with the reason.
+- [x] **Settings** shows the payout address, a **Submit directly** switch, and the visible toggle **Demo: disable double-spend guard**.
+- [x] Hide all crypto language from the main flow. Show "5 USDT", "Paid", "Covered". No gas, hashes or chain names.
+- [x] After settlement, show a link to the explorer.
 
 **You see.**
 

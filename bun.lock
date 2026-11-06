@@ -26,6 +26,7 @@
         "@hundi/wallet": "workspace:*",
         "react": "19.3.0",
         "react-dom": "19.3.0",
+        "viem": "2.57.16",
       },
       "devDependencies": {
         "@tailwindcss/vite": "4.3.4",

@@ -30,6 +30,7 @@ import {
   type Address,
   bytesToHex,
   encodeFunctionData,
+  erc20Abi,
   type Hex,
   http,
   type PublicClient,
@@ -52,6 +53,7 @@ import {
   revertReason,
   type Submit,
   settledIn,
+  USDT,
   USDT_DOMAIN,
   VAULT,
   whitechainSepolia,
@@ -67,6 +69,7 @@ import {
 } from "./store";
 
 const USDT_ATOMS = 1_000_000n;
+const TRAILING_ZEROS = /0+$/u;
 const DEFAULT_LIFETIME = 86_400n;
 const AUTHORIZATION_SECONDS = 3600n;
 /** What a relayer earns for carrying a call. Direct submission pays nothing. */
@@ -77,6 +80,15 @@ const SERIAL_BYTES = 16;
 const REQUEST_ID_BYTES = 8;
 
 const DEFAULT_SETTINGS: Settings = { guard: true, submitDirectly: false };
+
+export const formatUsdt = (atoms: bigint): string => {
+  const whole = atoms / USDT_ATOMS;
+  const part = (atoms % USDT_ATOMS)
+    .toString()
+    .padStart(6, "0")
+    .replace(TRAILING_ZEROS, "");
+  return part ? `${whole}.${part}` : `${whole}`;
+};
 
 export const usdt = (amount: number): UsdtAtoms =>
   (BigInt(Math.round(amount * 100)) * (USDT_ATOMS / 100n)) as UsdtAtoms;
@@ -434,8 +446,23 @@ export const openWallet = async (options: WalletOptions) => {
     return results;
   };
 
+  /** The safety deposit this key has posted, as of the last sync. */
+  const deposit = async (): Promise<bigint> =>
+    (await snapshot()).bonds.get(keyId(self))?.amount ?? 0n;
+
+  /** USDT waiting on the funding key, ready to load. Needs a network. */
+  const funds = (): Promise<bigint> =>
+    reads.readContract({
+      abi: erc20Abi,
+      address: USDT,
+      args: [funding.address],
+      functionName: "balanceOf",
+    });
+
   return {
     address: funding.address,
+    deposit,
+    funds,
     key: self,
     load,
     notes: () => store.notes(),
