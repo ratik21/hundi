@@ -1,11 +1,23 @@
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { Button, Page, Seal } from "./ui";
 
 const LONG_WORD = 8;
+/** The pause opens each buzz pattern, so the phone kicks as the stamp hits the paper. */
+const STAMP_LANDS_MS = 470;
 
 const TONES = {
-  bad: { page: "bg-stamp-bad", stamp: "text-stamp-bad", thud: "animate-shake" },
-  ok: { page: "bg-stamp-ok", stamp: "text-stamp-ok", thud: "animate-thud" },
+  bad: {
+    buzz: [STAMP_LANDS_MS, 60, 50, 60],
+    page: "bg-stamp-bad",
+    stamp: "text-stamp-bad",
+    thud: "animate-shake",
+  },
+  ok: {
+    buzz: [STAMP_LANDS_MS, 30],
+    page: "bg-stamp-ok",
+    stamp: "text-stamp-ok",
+    thud: "animate-thud",
+  },
 } as const;
 
 /** The stamp comes down on a paper note. The moment a demo is filmed for. */
@@ -28,7 +40,14 @@ export const Verdict = ({
   verdict: string;
   word: string;
 }) => {
-  const { page, stamp, thud } = TONES[tone];
+  const { buzz, page, stamp, thud } = TONES[tone];
+
+  useEffect(() => {
+    if ("vibrate" in navigator) {
+      navigator.vibrate([...buzz]);
+    }
+  }, [buzz]);
+
   return (
     <main
       className={`animate-flood flex min-h-(--app-height) flex-col overflow-hidden px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] text-white ${page}`}

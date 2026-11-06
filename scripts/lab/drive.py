@@ -17,6 +17,7 @@ step = [0]
 
 def use(name):
     switch_tab(tabs[name])
+    phone()
     cdp("Emulation.setFocusEmulationEnabled", enabled=True)
     cdp("Network.enable")
     cdp("Network.setBlockedURLs", urls=["*:8599*"] if offline[0] else [])
@@ -106,6 +107,21 @@ def press(label):
     click_at_xy(box["x"], box["y"])
 
 
+def press_shrinks(label):
+    box = js("(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()===%s);const r=b.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()"
+             % json.dumps(label))
+    mouse = {"x": box["x"], "y": box["y"], "button": "left", "clickCount": 1}
+    cdp("Input.dispatchMouseEvent", type="mousePressed", **mouse)
+    time.sleep(0.25)
+    scale = js("getComputedStyle(document.querySelector('button:active')).scale")
+    cdp("Input.dispatchMouseEvent", type="mouseReleased", **mouse)
+    assert scale == "0.97", (label, scale)
+
+
+def stub_vibrate():
+    js("window.__buzz=null;navigator.vibrate=p=>{window.__buzz=p;return true}")
+
+
 def sheet_open():
     return js("!!document.querySelector('[role=dialog]')")
 
@@ -136,9 +152,11 @@ def verdict(expected):
 
 def accept(name):
     use(name)
+    stub_vibrate()
     assert motions("Scan their payment", 800) == [], "a transition ran before the verdict"
     see("Paid")
     verdict("ok")
+    assert js("window.__buzz?.length") == 2, "a paid verdict should buzz once"
     shot(f"{name}-paid")
     tap("Done")
 
@@ -188,6 +206,11 @@ see("20 USDT")
 see("2 notes of 5 USDT")
 shot("customer-loaded")
 assert cool_glow() == "0", "the glow should be marigold online"
+assert js("getComputedStyle(document.querySelector('.stagger > :nth-child(2)')).animationDelay") == "0.04s"
+press_shrinks("tokens")
+press_key("Tab")
+ring = js("getComputedStyle(document.activeElement).outlineStyle")
+assert ring == "solid", ring
 tap("Account")
 see("View on explorer")
 shot("customer-account")
@@ -275,9 +298,11 @@ pay("customer")
 tap("Done")
 use("stall")
 cdp("Emulation.setEmulatedMedia", features=[{"name": "prefers-reduced-motion", "value": "reduce"}])
+stub_vibrate()
 tap("Scan their payment")
 see("Refused")
 verdict("seen_before")
+assert js("window.__buzz?.length") == 4, "a refused verdict should buzz twice"
 still = js("getComputedStyle(document.querySelector('.stamp')).animationName")
 assert still == "none", still
 shot("stall-refused")
@@ -303,7 +328,9 @@ see("Receipt", 60)
 verdict("Settled")
 shot("supplier-settled")
 tap("Done")
+rest = js("getComputedStyle(document.querySelector('[data-underline]')).translate")
 tap("activity")
+assert js("getComputedStyle(document.querySelector('[data-underline]')).translate") != rest, "the underline should slide"
 see("Paid out to you")
 shot("supplier-activity")
 

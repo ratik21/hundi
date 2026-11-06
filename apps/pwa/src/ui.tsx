@@ -112,7 +112,7 @@ export const Glyph = ({
 );
 
 export const PledgeRows = () => (
-  <ul className="flex flex-col gap-4">
+  <ul className="stagger flex flex-col gap-4">
     {PLEDGES.map(({ glyph, line, title }) => (
       <li className="flex items-center gap-3" key={title}>
         <RowIcon tone="text-accent">
@@ -203,7 +203,7 @@ export const Button = ({
   variant?: keyof typeof BUTTON;
 }) => (
   <button
-    className={`w-full rounded-2xl px-4 py-4 text-lg font-semibold transition active:scale-[0.98] disabled:opacity-40 ${BUTTON[variant]}`}
+    className={`w-full rounded-2xl px-4 py-4 text-lg font-semibold disabled:opacity-40 ${BUTTON[variant]}`}
     disabled={disabled}
     onClick={onClick}
     type="button"
@@ -283,7 +283,7 @@ export const Sheet = ({
     <div className="fixed inset-0 z-10 flex flex-col justify-end">
       <button
         aria-label="Close"
-        className={`animate-fade absolute inset-0 bg-black/60 transition-opacity duration-200 ${
+        className={`animate-fade absolute inset-0 bg-black/60 transition-opacity duration-200 focus-visible:outline-none active:scale-100 ${
           closing ? "opacity-0" : ""
         }`}
         onClick={close}
@@ -300,7 +300,7 @@ export const Sheet = ({
       >
         <button
           aria-label="Drag down to close"
-          className="-mb-2 flex h-7 w-full shrink-0 touch-none items-center justify-center"
+          className="-mb-2 flex h-7 w-full shrink-0 touch-none items-center justify-center active:scale-100"
           data-handle
           onClick={() => {
             if (travelled.current < DRAG_TAP_PX) {

@@ -285,7 +285,7 @@ const Action = ({
 }) => (
   <button
     aria-label={label}
-    className="flex flex-col items-center gap-1.5 text-sm font-medium transition active:scale-95 disabled:opacity-40"
+    className="flex flex-col items-center gap-1.5 text-sm font-medium disabled:opacity-40"
     disabled={disabled}
     onClick={onClick}
     type="button"
@@ -333,7 +333,7 @@ const Tokens = ({
   groups: readonly NoteGroup[];
   lost: bigint;
 }) => (
-  <ul>
+  <ul className="stagger">
     <TokenRow
       amount={`${formatUsdt(groupsTotal(groups))} USDT`}
       detail={
@@ -632,14 +632,15 @@ export const Home = ({
 
       {!fresh && (
         <section>
-          <div className="border-line flex gap-6 border-b" role="tablist">
+          <div
+            className="border-line relative grid grid-cols-2 border-b"
+            role="tablist"
+          >
             {(["tokens", "activity"] as const).map((name) => (
               <button
                 aria-selected={tab === name}
-                className={`-mb-px border-b-2 pb-2 font-semibold capitalize ${
-                  tab === name
-                    ? "border-accent text-fg"
-                    : "text-muted border-transparent"
+                className={`pb-2 font-semibold capitalize transition-colors ${
+                  tab === name ? "text-fg" : "text-muted"
                 }`}
                 key={name}
                 onClick={() => setTab(name)}
@@ -649,6 +650,13 @@ export const Home = ({
                 {name}
               </button>
             ))}
+            <span
+              aria-hidden="true"
+              className={`bg-accent absolute -bottom-px left-0 h-0.5 w-1/2 transition-transform duration-200 ease-out ${
+                tab === "activity" ? "translate-x-full" : ""
+              }`}
+              data-underline
+            />
           </div>
           {tab === "tokens" ? (
             <Tokens
@@ -657,7 +665,7 @@ export const Home = ({
               lost={view.depositLost}
             />
           ) : (
-            <ul>
+            <ul className="stagger">
               {lines.map((line) => (
                 <ActivityRow key={line.id} line={line} />
               ))}
