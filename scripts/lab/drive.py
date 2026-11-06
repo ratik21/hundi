@@ -24,7 +24,7 @@ def use(name):
 
 
 def text():
-    return js("document.body.innerText")
+    return " ".join(js("document.body?.innerText ?? ''").split())
 
 
 def tap(label):
@@ -44,7 +44,10 @@ def see(needle, seconds=45):
     raise AssertionError(f"never saw {needle!r}: {text()[:300]}")
 
 
-def shot(name):
+def shot(name, wait=0.6):
+    time.sleep(wait)
+    width = js("document.documentElement.scrollWidth")
+    assert width <= 390, (name, width)
     step[0] += 1
     path = f"{SHOTS}/{step[0]:02d}-{name}.png"
     with open(path, "wb") as file:
@@ -54,7 +57,6 @@ def shot(name):
 def request_from(name):
     use(name)
     tap("Receive")
-    tap("Ask for 5 USDT")
     see("Ask them to scan")
     time.sleep(0.5)
 
@@ -63,15 +65,24 @@ def pay(name):
     use(name)
     tap("Pay")
     see("You are paying")
+    shot(f"{name}-confirm")
     tap("Pay")
     see("Show this to them")
     time.sleep(0.5)
+
+
+def verdict(expected):
+    see("Done")
+    found = js("document.querySelector('[data-verdict]')?.dataset.verdict")
+    assert found == expected, (found, expected, text()[:300])
+    time.sleep(1.2)
 
 
 def accept(name):
     use(name)
     tap("Scan their payment")
     see("Paid")
+    verdict("ok")
     shot(f"{name}-paid")
     tap("Done")
 
@@ -91,44 +102,59 @@ for name, port in PORTS.items():
     time.sleep(2)
 
 use("customer")
-see("You can spend")
+see("Nothing here yet")
 shot("customer-empty")
 tap("Add money")
 see("Available to add")
 shot("customer-add-money")
+tap("Change amounts")
+tap("More Notes")
+see("at least twice your notes")
+shot("customer-adjust")
+tap("Less Notes")
 tap("Add 30 USDT")
+see("Adding your money")
+shot("customer-adding", 0)
 see("Safety deposit 20", 60)
+see("2 notes of 5 USDT")
 shot("customer-loaded")
 
 use("stall")
-see("You can spend")
+see("Nothing here yet")
 tap("Add money")
 see("Available to add")
-tap("Less Notes")
-tap("Less Notes")
-tap("Less Safety deposit")
-tap("Less Safety deposit")
+tap("For my stall")
 tap("Add 10 USDT")
 see("Safety deposit 10", 60)
+see("You can spend")
 
 for name in tabs:
     use(name)
-    see("You can spend")
-    tap("Check now")
+    see("Updated")
+    tap("Refresh")
     time.sleep(1)
 
 offline[0] = True
 use("customer")
 chain = js("fetch('http://localhost:8599',{method:'POST',body:'{}'}).then(()=>'reached',()=>'blocked')")
 assert chain == "blocked", "the chain is still reachable"
+see("Payments still work")
 shot("customer-offline")
 
 request_from("stall")
 shot("stall-request")
+tap("Scan their payment")
+see("Point at the code on their phone")
+shot("stall-scan")
+tap("Back")
+see("Ask them to scan")
 pay("customer")
 shot("customer-payment")
 tap("Done")
 accept("stall")
+see("You received 5 USDT")
+see("Settle when you have signal")
+shot("stall-received")
 
 request_from("supplier")
 pay("stall")
@@ -149,6 +175,7 @@ tap("Pay")
 see("You are paying")
 tap("Pay")
 see("No note can pay")
+see("What to do next")
 shot("customer-guard-refuses")
 tap("Done")
 tap("Settings")
@@ -158,10 +185,23 @@ shot("customer-guard-off")
 tap("Back")
 see("guard is off")
 
+request_from("stall")
+pay("customer")
+tap("Done")
+use("stall")
+cdp("Emulation.setEmulatedMedia", features=[{"name": "prefers-reduced-motion", "value": "reduce"}])
+tap("Scan their payment")
+see("Refused")
+verdict("seen_before")
+still = js("getComputedStyle(document.querySelector('.stamp')).animationName")
+assert still == "none", still
+shot("stall-refused")
+cdp("Emulation.setEmulatedMedia", features=[])
+tap("Done")
+
 use("supplier")
 tap("Back")
 tap("Receive")
-tap("Ask for 5 USDT")
 see("Ask them to scan")
 time.sleep(0.5)
 pay("customer")
@@ -172,21 +212,32 @@ offline[0] = False
 use("supplier")
 time.sleep(1)
 tap("Settle")
+see("Settling")
+shot("supplier-settling", 0)
 see("Receipt", 60)
-time.sleep(2)
+verdict("Settled")
 shot("supplier-settled")
+tap("Done")
+see("Paid out to you")
+shot("supplier-activity")
 
 use("stall")
 time.sleep(1)
 tap("Settle")
 see("Covered", 60)
-time.sleep(2)
+verdict("Covered")
 shot("stall-covered")
+tap("Done")
+see("Covered by a deposit")
+shot("stall-activity")
 
 use("customer")
-tap("Check now")
+tap("Refresh")
 see("Safety deposit 10", 30)
 shot("customer-after-cheat")
+
+js("location.hash='#qr-test'")
+see("Hundi QR test")
 
 for target in tabs.values():
     cdp("Target.closeTarget", targetId=target)
