@@ -11,6 +11,7 @@
     "build": "bun run --filter '@hundi/pwa' build",
     "check": "ultracite check",
     "fix": "ultracite fix",
+    "relayer": "scripts/relayer-up.sh",
     "test": "bun test packages apps",
     "typecheck": "tsc --noEmit"
   },
