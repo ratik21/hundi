@@ -86,13 +86,15 @@ const REQUEST_ID_BYTES = 8;
 
 const DEFAULT_SETTINGS: Settings = { guard: true, submitDirectly: false };
 
+const CENT_DIGITS = 2;
+
 export const formatUsdt = (atoms: bigint): string => {
   const whole = atoms / USDT_ATOMS;
   const part = (atoms % USDT_ATOMS)
     .toString()
     .padStart(6, "0")
     .replace(TRAILING_ZEROS, "");
-  return part ? `${whole}.${part}` : `${whole}`;
+  return part ? `${whole}.${part.padEnd(CENT_DIGITS, "0")}` : `${whole}`;
 };
 
 export const usdt = (amount: number): UsdtAtoms =>

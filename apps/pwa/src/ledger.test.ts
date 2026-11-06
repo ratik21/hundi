@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import type { Note, NoteId } from "@hundi/core/types";
 import type { NoteRecord, Receipt } from "@hundi/wallet/store";
-import type { SettleResult } from "@hundi/wallet/wallet";
+import { formatUsdt, type SettleResult } from "@hundi/wallet/wallet";
 import type { Hex } from "viem";
 import {
   activityOf,
@@ -156,5 +156,14 @@ describe("dollars", () => {
     expect(dollars(10_000_000n)).toBe("$10.00");
     expect(dollars(4_900_000n)).toBe("$4.90");
     expect(dollars(50_000n)).toBe("$0.05");
+  });
+});
+
+describe("formatUsdt", () => {
+  test("shows part amounts to at least the cent, and whole amounts bare", () => {
+    expect(formatUsdt(4_900_000n)).toBe("4.90");
+    expect(formatUsdt(100_000n)).toBe("0.10");
+    expect(formatUsdt(5_000_000n)).toBe("5");
+    expect(formatUsdt(1_234_567n)).toBe("1.234567");
   });
 });
