@@ -236,8 +236,7 @@ shot("stall-activity")
 
 use("customer")
 tap("Refresh")
-see("Safety deposit", 30)
-see("10 USDT")
+see("10 USDT taken", 30)
 shot("customer-after-cheat")
 
 js("location.hash='#qr-test'")

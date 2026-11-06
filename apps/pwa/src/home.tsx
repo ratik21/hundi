@@ -265,9 +265,11 @@ const TokenRow = ({
 const Tokens = ({
   deposit,
   groups,
+  lost,
 }: {
   deposit: bigint;
   groups: readonly NoteGroup[];
+  lost: bigint;
 }) => (
   <ul>
     <TokenRow
@@ -280,16 +282,21 @@ const Tokens = ({
       icon={<TokenIcon />}
       title="USDT notes"
     />
-    {deposit > 0n && (
+    {(deposit > 0n || lost > 0n) && (
       <TokenRow
         amount={`${formatUsdt(deposit)} USDT`}
-        detail="Still yours. It is why strangers trust your notes."
+        detail={
+          lost > 0n
+            ? `${formatUsdt(lost)} USDT taken. A note from this phone was spent twice.`
+            : "Still yours. It is why strangers trust your notes."
+        }
         icon={
           <RowIcon tone="text-accent">
             <Glyph name="shield" />
           </RowIcon>
         }
         title="Safety deposit"
+        tone={lost > 0n ? "text-bad" : ""}
       />
     )}
   </ul>
@@ -590,7 +597,11 @@ export const Home = ({
             ))}
           </div>
           {tab === "tokens" ? (
-            <Tokens deposit={view.deposit} groups={groups} />
+            <Tokens
+              deposit={view.deposit}
+              groups={groups}
+              lost={view.depositLost}
+            />
           ) : (
             <ul>
               {lines.map((line) => (

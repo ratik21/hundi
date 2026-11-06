@@ -8,6 +8,7 @@ import time
 SHOTS = ".lab/shots/shop"
 os.makedirs(SHOTS, exist_ok=True)
 WALLET = "http://localhost:5191/"
+STALL = "http://localhost:5192/"
 SHOP = "http://localhost:5194/"
 ROOT = "document.querySelector('#till')?.shadowRoot"
 offline = [False]
@@ -63,7 +64,7 @@ def open_fresh(name, url, width, height):
 
 
 for tab in list_tabs():
-    if any(port in tab.get("url", "") for port in ("localhost:5191", "localhost:5194")):
+    if any(port in tab.get("url", "") for port in ("localhost:5191", "localhost:5192", "localhost:5194")):
         cdp("Target.closeTarget", targetId=tab.get("targetId") or tab.get("id"))
 time.sleep(0.5)
 
@@ -74,6 +75,10 @@ tap("Add money")
 see("Available to add")
 tap("Add 30 USDT")
 see("2 notes of 5 USDT", 60)
+
+open_fresh("stall", STALL, 390, 844)
+use("stall")
+see("Nothing here yet")
 
 open_fresh("shop", SHOP, 1280, 800)
 use("shop")
@@ -107,6 +112,40 @@ tap("Settle")
 see("settled", 60)
 shot("till-settled")
 
+# The stall takes the customer's other note, then settling fails on the chain read.
+offline[0] = True
+use("stall")
+tap("Receive")
+see("Ask them to scan")
+time.sleep(0.5)
+use("customer")
+tap("Done")
+tap("Pay")
+see("You are paying")
+tap("Pay")
+see("Show this to them")
+time.sleep(0.5)
+use("stall")
+tap("Scan their payment")
+see("Paid")
+see("Done")
+tap("Done")
+offline[0] = False
+use("stall")
+see("You received 5 USDT")
+js("const real=fetch;window.__fetch=real;window.fetch=(url,init)=>String(init?.body).includes('eth_call')?Promise.reject(new TypeError('blocked')):real(url,init)")
+tap("Settle")
+see("Not settled", 90)
+shot("stall-not-settled")
+js("window.fetch=window.__fetch")
+tap("Done")
+see("You received 5 USDT")
+tap("Settle")
+see("Receipt", 60)
+shot("stall-settled-on-retry")
+tap("Done")
+
+use("shop")
 cdp("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
 js("location.hash='#customer'")
 time.sleep(1)

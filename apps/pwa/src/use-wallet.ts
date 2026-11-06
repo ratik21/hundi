@@ -6,6 +6,7 @@ import { createReads, relayerUrl, writes } from "./network";
 
 export interface WalletView {
   deposit: bigint;
+  depositLost: bigint;
   notes: readonly NoteRecord[];
   receipts: readonly Receipt[];
   settings: Settings;
@@ -16,14 +17,23 @@ const describe = (cause: unknown): string =>
   cause instanceof Error ? cause.message : String(cause);
 
 const readView = async (wallet: Wallet): Promise<WalletView> => {
-  const [deposit, notes, receipts, settings, snapshot] = await Promise.all([
-    wallet.deposit(),
-    wallet.notes(),
-    wallet.receipts(),
-    wallet.settings(),
-    wallet.snapshot(),
-  ]);
-  return { deposit, notes, receipts, settings, syncedAt: snapshot.syncedAt };
+  const [deposit, depositLost, notes, receipts, settings, snapshot] =
+    await Promise.all([
+      wallet.deposit(),
+      wallet.depositLost(),
+      wallet.notes(),
+      wallet.receipts(),
+      wallet.settings(),
+      wallet.snapshot(),
+    ]);
+  return {
+    deposit,
+    depositLost,
+    notes,
+    receipts,
+    settings,
+    syncedAt: snapshot.syncedAt,
+  };
 };
 
 export const useOnline = (): boolean => {

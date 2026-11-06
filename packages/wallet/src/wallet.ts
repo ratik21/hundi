@@ -207,6 +207,10 @@ export const openWallet = async (options: WalletOptions) => {
     const next = applyEvents(await snapshot(), events, now());
     await store.write("snapshot", next);
     await store.write("syncedBlock", to);
+    const posted = next.bonds.get(keyId(self))?.amount ?? 0n;
+    if (posted > ((await store.read("depositPeak")) ?? 0n)) {
+      await store.write("depositPeak", posted);
+    }
     return next;
   };
 
@@ -478,6 +482,13 @@ export const openWallet = async (options: WalletOptions) => {
   const deposit = async (): Promise<bigint> =>
     (await snapshot()).bonds.get(keyId(self))?.amount ?? 0n;
 
+  /** What was taken from the deposit for spending a note twice. Only slashing lowers it before its lock ends. */
+  const depositLost = async (): Promise<bigint> => {
+    const peak = (await store.read("depositPeak")) ?? 0n;
+    const current = await deposit();
+    return peak > current ? peak - current : 0n;
+  };
+
   /** USDT waiting on the funding key, ready to load. Needs a network. */
   const funds = (): Promise<bigint> =>
     reads.readContract({
@@ -493,6 +504,7 @@ export const openWallet = async (options: WalletOptions) => {
   return {
     address: funding.address,
     deposit,
+    depositLost,
     funds,
     key: self,
     load,

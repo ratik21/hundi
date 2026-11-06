@@ -207,6 +207,9 @@ describe.skipIf(!anvil)("Appendix F story", () => {
     expect(await usdtOf(stall.address)).toBe(usdt(5));
     expect(await bondOf(customer)).toBe(usdt(10));
     expect(await bondOf(stall)).toBe(usdt(10));
+    await customer.sync();
+    expect(await customer.depositLost()).toBe(usdt(10));
+    expect(await stall.depositLost()).toBe(0n);
     expect(
       await reads.readContract({
         abi: vaultAbi,
@@ -242,6 +245,7 @@ describe.skipIf(!anvil)("Appendix F story", () => {
     await customer.load({ bond: usdt(10), notes: [usdt(5)] });
 
     expect(await customer.deposit()).toBe(usdt(10));
+    expect(await customer.depositLost()).toBe(0n);
   }, 120_000);
 
   test("settle is idempotent after a lost reply", async () => {

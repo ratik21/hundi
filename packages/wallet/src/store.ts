@@ -35,6 +35,8 @@ export interface Receipt {
 }
 
 export interface Meta {
+  /** The largest safety deposit this device has seen for its own key. */
+  depositPeak: bigint;
   fundingKey: Hex;
   receipts: readonly Receipt[];
   settings: Settings;
