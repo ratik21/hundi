@@ -102,7 +102,7 @@ The till has a merchant view and a customer view. It works in airplane mode afte
 
 The payer never holds WBT or writes down a seed phrase, and no payment screen names a chain. The network shows only behind a tap, on the Wallet sheet. The relayer pays the gas and takes a 0.10 USDT fee out of the payout, so a 5 USDT note pays 4.90. Measured gas cost is about 0.044 USDT for a settle and 0.074 USDT for a load.
 
-The relayer earns USDT and spends WBT, so it buys its own gas on Uniswap. Below 0.1 WBT it swaps 2 USDT of earned fees on the v3 pool. See [Uniswap](#uniswap).
+The relayer earns USDT and spends WBT, so it buys its own gas on Uniswap. Below 0.1 WBT it swaps 2 USDT on the v3 pool. See [Uniswap](#uniswap).
 
 These checks stop someone draining it:
 
@@ -119,14 +119,16 @@ The relayer refills its own gas through the Uniswap v3 `SwapRouter02` on Whitech
 
 | What | Where |
 | --- | --- |
-| Swap USDT to wrapped WBT, then unwrap, in one `multicall` | [`refill.ts#L35-L60`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/refill.ts#L35-L60) |
-| Simulate, then send | [`refill.ts#L65-L111`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/refill.ts#L65-L111) |
-| When to refill, and the price floor | [`policy.ts#L72-L82`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/policy.ts#L72-L82) |
-| Runs after each sent call | [`handler.ts#L86-L90`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/handler.ts#L86-L90) |
+| The two calls, swap then unwrap | [`refill.ts#L38-L62`](https://github.com/ratik21/hundi/blob/b8d93cf/apps/relayer/src/refill.ts#L38-L62) |
+| `multicall`, simulated, then sent | [`refill.ts#L112-L119`](https://github.com/ratik21/hundi/blob/b8d93cf/apps/relayer/src/refill.ts#L112-L119) |
+| When to refill, and the price floor | [`policy.ts#L72-L82`](https://github.com/ratik21/hundi/blob/b8d93cf/apps/relayer/src/policy.ts#L72-L82) |
+| Runs after the reply to each sent call | [`handler.ts#L88-L96`](https://github.com/ratik21/hundi/blob/b8d93cf/apps/relayer/src/handler.ts#L88-L96) |
 
-A real swap on the testnet: [0x257e...2725](https://explorer.testnet.whitechain.io/tx/0x257e04889dbdbe086acff4953a25b8b42fdcaf5de9a97407a4f9115784982725). It spent 2 USDT and gained 0.0263 WBT after gas.
+A real swap on the testnet: [0x257e...2725](https://explorer.testnet.whitechain.io/tx/0x257e04889dbdbe086acff4953a25b8b42fdcaf5de9a97407a4f9115784982725). It spent 2 USDT and gained 0.0263 WBT after gas for the approve and the swap.
 
-The swap is limited three ways. It runs only below 0.1 WBT, it spends 2 USDT at a time and keeps 2 USDT in reserve, and it reverts below 90% of the relayer's fixed rate. A failed refill is logged and never fails the settle already sent. A fork test runs it against the real pool through the relayer.
+The swap is limited three ways. It runs only below 0.1 WBT, it spends 2 USDT at a time and needs at least 4 USDT on hand, and it reverts below 90% of the relayer's fixed rate of 75 USDT per WBT. The refill runs after the reply, so a slow or failed refill cannot affect a settle already sent. A failure is only logged. A fork test runs it against the real pool through the relayer.
+
+The floor is fixed, so a pool price above about 83 USDT per WBT makes every swap fail. If WBT then runs out, the relayer cannot send anything. Its operator must top it up from the faucet, or run `scripts/refill-once.ts`.
 
 ## CROPS
 
@@ -157,6 +159,8 @@ Hundi does not stop a double-spend. It makes one provable and costly.
 - The apps have no screens for `reclaim` or `withdrawBond`, although the contract has both.
 - Whitechain is an L2 with a sequencer, and USDT can be frozen by its issuer.
 - The relayer is one hosted function with one key. If it stops, direct settlement still works.
+- The relayer orders its sends within one running instance only. Two instances can clash on a nonce or both refill at once. A retry fixes a clash.
+- If the reply to a load is lost, the app forgets notes the chain may have minted. That money comes back only through `reclaim` after expiry, which has no screen.
 
 ## What is new and what is reused
 

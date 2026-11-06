@@ -572,7 +572,7 @@ The judge traced first settle, second settle, strict prefix, prefix extension, n
 | Receiver rejects a note minted after its last sync | U4 | `unknown_note` in the demo | Always sync all devices after `load`, and state this limit |
 | Anon-RPC gateway is down | U8 | Reads hang | Time out, fall back to direct reads, and say so on screen |
 | Venue network fails during the demo | U9 | No signal at judging | The offline half needs none. Use a hotspot and pre-settled links |
-| Faucet or gas runs out | U2 | Relayer below 0.1 WBT | The relayer swaps 2 USDT of earned fees for WBT on Uniswap. See `apps/relayer/src/refill.ts` |
+| Faucet or gas runs out | U2 | Relayer below 0.1 WBT | The relayer swaps 2 USDT for WBT on Uniswap. See `apps/relayer/src/refill.ts` |
 
 ## Appendix E. What Hundi cannot prevent, and how to answer judges
 
