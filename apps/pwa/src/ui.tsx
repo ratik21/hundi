@@ -270,11 +270,9 @@ export const Sheet = ({
   }, [close]);
 
   const release = () => {
-    const distance = dragged ?? 0;
     grabbedAt.current = null;
-    travelled.current = distance;
     setDragged(null);
-    if (distance >= DRAG_CLOSE_PX) {
+    if (travelled.current >= DRAG_CLOSE_PX) {
       close();
     }
   };
@@ -315,7 +313,11 @@ export const Sheet = ({
           }}
           onPointerMove={(event) => {
             if (grabbedAt.current !== null) {
-              setDragged(Math.max(0, event.clientY - grabbedAt.current));
+              travelled.current = Math.max(
+                0,
+                event.clientY - grabbedAt.current
+              );
+              setDragged(travelled.current);
             }
           }}
           onPointerUp={release}
