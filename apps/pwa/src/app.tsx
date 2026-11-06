@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { AddMoney } from "./add-money";
 import { Home } from "./home";
 import { Failure, Working } from "./moments";
+import { slide } from "./motion";
 import { Pay } from "./pay";
 import { TAGLINE } from "./pledges";
 import { Receive } from "./receive";
@@ -15,8 +16,12 @@ const Screens = () => {
   const [route, setRoute] = useState<Route>("home");
   const { error, online, refresh, sync, view, wallet } = useWallet();
 
+  const go = useCallback((next: Route) => {
+    slide("push", () => setRoute(next));
+  }, []);
+
   const home = useCallback(() => {
-    setRoute("home");
+    slide("back", () => setRoute("home"));
     refresh();
   }, [refresh]);
 
@@ -41,7 +46,7 @@ const Screens = () => {
     return (
       <Pay
         guard={view.settings.guard}
-        onAddMoney={online ? () => setRoute("add") : undefined}
+        onAddMoney={online ? () => go("add") : undefined}
         onDone={home}
         wallet={wallet}
       />
@@ -57,7 +62,7 @@ const Screens = () => {
   }
   return (
     <Home
-      go={setRoute}
+      go={go}
       online={online}
       refresh={refresh}
       sync={sync}
@@ -88,7 +93,7 @@ export const App = () => (
       className="lg:ring-line lg:h-(--app-height) lg:overflow-hidden lg:rounded-(--app-radius) lg:shadow-2xl lg:ring-1 lg:contain-layout"
       data-wallet
     >
-      <div className="lg:h-full lg:[scrollbar-width:none] lg:overflow-y-auto">
+      <div className="wallet lg:h-full lg:[scrollbar-width:none] lg:overflow-y-auto">
         <Screens />
       </div>
     </div>

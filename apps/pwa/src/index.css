@@ -156,6 +156,82 @@ body {
   transform: rotate(-6deg);
 }
 
+.wallet {
+  background: var(--color-base);
+}
+
+@keyframes push-in {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@keyframes push-out {
+  to {
+    opacity: 0.5;
+    translate: -25% 0;
+  }
+}
+
+@keyframes back-in {
+  from {
+    opacity: 0.5;
+    translate: -25% 0;
+  }
+}
+
+@keyframes back-out {
+  to {
+    translate: 100% 0;
+  }
+}
+
+@supports (view-transition-name: none) {
+  .wallet {
+    view-transition-name: wallet;
+  }
+
+  /* biome-ignore lint/suspicious/useBaseline: The @supports above gates it. Without this, the overlay would swallow taps. */
+  ::view-transition {
+    pointer-events: none;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(wallet) {
+    animation: none;
+  }
+
+  ::view-transition-image-pair(wallet) {
+    overflow: clip;
+    border-radius: var(--app-radius);
+  }
+
+  ::view-transition-old(wallet),
+  ::view-transition-new(wallet) {
+    mix-blend-mode: normal;
+    animation: 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  [data-slide="push"]::view-transition-old(wallet) {
+    animation-name: push-out;
+  }
+
+  [data-slide="push"]::view-transition-new(wallet) {
+    animation-name: push-in;
+  }
+
+  [data-slide="back"]::view-transition-old(wallet) {
+    z-index: 1;
+    animation-name: back-out;
+  }
+
+  [data-slide="back"]::view-transition-new(wallet) {
+    animation-name: back-in;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,

@@ -36,6 +36,11 @@ def tap(label):
     time.sleep(0.4)
 
 
+def motions(label, ms=350):
+    return js("new Promise(done=>{const m=[...document.querySelectorAll('button')].filter(b=>b.textContent.trim().startsWith(%s)||b.getAttribute('aria-label')===%s);m[0].click();const seen=new Set(),end=performance.now()+%d;const look=()=>{for(const a of document.getAnimations()){const p=a.effect.pseudoElement;if(p?.includes('view-transition'))seen.add(a.animationName)}performance.now()<end?requestAnimationFrame(look):done([...seen])};requestAnimationFrame(look)})"
+              % (json.dumps(label), json.dumps(label), ms))
+
+
 def see(needle, seconds=45):
     deadline = time.time() + seconds
     while time.time() < deadline:
@@ -101,7 +106,7 @@ def verdict(expected):
 
 def accept(name):
     use(name)
-    tap("Scan their payment")
+    assert motions("Scan their payment", 800) == [], "a transition ran before the verdict"
     see("Paid")
     verdict("ok")
     shot(f"{name}-paid")
@@ -216,14 +221,14 @@ see("No note can pay")
 see("What to do next")
 shot("customer-guard-refuses")
 tap("Done")
-tap("Settings")
+assert set(motions("Settings")) == {"push-out", "push-in"}
 see("What Hundi stands for")
 for pledge in PLEDGES:
     see(pledge)
 tap("Demo: disable double-spend guard")
 see("With the guard off")
 shot("customer-guard-off")
-tap("Back")
+assert set(motions("Back")) == {"back-out", "back-in"}
 see("guard is off")
 
 request_from("stall")
@@ -237,8 +242,8 @@ verdict("seen_before")
 still = js("getComputedStyle(document.querySelector('.stamp')).animationName")
 assert still == "none", still
 shot("stall-refused")
+assert motions("Done") == [], "reduced motion must skip the slide"
 cdp("Emulation.setEmulatedMedia", features=[])
-tap("Done")
 
 use("supplier")
 tap("Back")
