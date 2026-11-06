@@ -19,7 +19,7 @@ I built Hundi at ETHGlobal Mumbai with Claude Code as my coding agent. I set the
 | Story test | The whole demo runs in one test, including a double-spend claim |
 | Failing test first | Hashes and bug fixes start from a failure, as in `f0c9b9f` then `93360ba` |
 | Real-chain checks | A sync bug missed on a fork (0 of 12) appeared on the testnet (2 of 10) |
-| Scripted app runs | Every screen is driven in Chrome and iOS Safari |
+| Scripted app runs | The main payment flows are driven in Chrome and iOS Safari |
 | Independent review | A separate agent reviews changes it didn't write |
 | Real devices | An [iPhone in airplane mode paid a laptop by camera](https://explorer.testnet.whitechain.io/tx/0x13d45e60b0a2446c156cdda4e6e834cc39cd19bae3df4b873cd366d3aeaee589) |
 
