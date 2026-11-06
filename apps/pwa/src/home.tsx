@@ -633,7 +633,7 @@ export const Home = ({
           <p className="font-semibold">{formatUsdt(received)} USDT pending</p>
           <p className="text-muted mt-0.5 text-sm">
             {online
-              ? "Claim it now, or spend it on."
+              ? "Claim it now, or spend it again."
               : "Claim it when you're online. It's safe on this phone."}
           </p>
         </Card>
