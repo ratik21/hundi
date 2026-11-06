@@ -265,7 +265,7 @@ export const QrCode = ({ bytes }: { bytes: Uint8Array }) => {
 
   return (
     <div
-      className="flex justify-center rounded-xl bg-white shadow-[0_0_0_1px_rgb(26_33_51/0.1)]"
+      className="flex justify-center overflow-hidden rounded-2xl bg-white"
       data-qr
       ref={frame}
     >

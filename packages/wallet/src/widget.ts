@@ -67,7 +67,7 @@ button:active { transform: scale(.98); }
 button.plain { border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
 button.light { background: #fff; color: #000; }
 button:disabled { opacity: .4; }
-.qr { display: flex; justify-content: center; border-radius: 16px; background: #fff; }
+.qr { display: flex; justify-content: center; overflow: hidden; border-radius: 16px; background: #fff; }
 canvas { display: block; max-width: 100%; }
 .camera { position: relative; overflow: hidden; aspect-ratio: 1; border-radius: 16px; background: #000; }
 video { display: block; width: 100%; height: 100%; object-fit: cover; }
