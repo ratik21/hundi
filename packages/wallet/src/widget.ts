@@ -17,6 +17,7 @@ import { formatUsdt, openWallet, type Wallet } from "./wallet";
 const RELAYER_FILE = "https://hundi-ten.vercel.app/relayer.txt";
 const USDT_DECIMALS = 6;
 const CONTROL_WAIT_MS = 3000;
+const FOOTER = "Hundi. Works with no network.";
 
 const STYLE = `
 :host {
@@ -57,6 +58,7 @@ p { margin: 0; }
   background: rgb(245 184 61 / .1); font-weight: 600;
 }
 .offline[hidden] { display: none; }
+.foot { margin-top: 14px; color: var(--muted); font-size: .8em; text-align: center; }
 .row { display: flex; gap: 10px; }
 button {
   flex: 1; padding: 14px; border: 0; border-radius: 16px; background: var(--accent);
@@ -64,6 +66,7 @@ button {
   transition: transform .1s;
 }
 button:active { transform: scale(.98); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button.plain { border: 1px solid var(--line); background: var(--surface); color: var(--fg); }
 button.light { background: #fff; color: #000; }
 button:disabled { opacity: .4; }
@@ -231,7 +234,7 @@ const mount = (wallet: Wallet, root: ShadowRoot, options: HundiOptions) => {
   addEventListener("online", showNetwork);
   addEventListener("offline", showNetwork);
   showNetwork();
-  root.append(offline, box);
+  root.append(offline, box, element("p", "foot", FOOTER));
   let stopCamera: () => void = () => undefined;
 
   const show = (...nodes: Node[]) => {

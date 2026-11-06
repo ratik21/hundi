@@ -84,6 +84,7 @@ see(TAGLINE)
 open_fresh("shop", SHOP, 1280, 800)
 use("shop")
 see("To pay")
+see("Hundi. Works with no network.")
 shot("till-online")
 
 offline[0] = True
