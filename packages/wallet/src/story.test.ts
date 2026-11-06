@@ -17,7 +17,7 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { createHandler } from "../../../apps/relayer/src/handler";
 import { fixedWindowLimiter } from "../../../apps/relayer/src/policy";
 import { vaultAbi } from "./abi.generated";
-import { USDT, VAULT, whitechainSepolia } from "./chain-io";
+import { relayerFrom, USDT, VAULT, whitechainSepolia } from "./chain-io";
 import { deviceKeyFrom, generateKeyPair } from "./keystore";
 import { memoryStore } from "./store";
 import { openWallet, usdt, type Wallet } from "./wallet";
@@ -70,7 +70,10 @@ const bondOf = async (wallet: Wallet) => {
   return amount;
 };
 
-const newWallet = async (store = memoryStore(), relayer?: string) =>
+const newWallet = async (
+  store = memoryStore(),
+  relayer?: string | (() => Promise<string | undefined>)
+) =>
   openWallet({
     device: await deviceKeyFrom(await generateKeyPair()),
     reads,
@@ -318,6 +321,32 @@ describe.skipIf(!anvil)("Appendix F story", () => {
       expect(await usdtOf(relayerAccount.address)).toBe(before + usdt(0.1));
       expect(await reads.getBalance({ address: stall.address })).toBe(0n);
     }, 120_000);
+
+    test("Submit directly works when the relayer lookup is gone", async () => {
+      const customer = await newWallet();
+      const stall = await newWallet(memoryStore(), () =>
+        Promise.reject(new Error("The domain is gone"))
+      );
+      await fund(customer, usdt(15));
+      await control.setBalance({
+        address: stall.address,
+        value: parseEther("1"),
+      });
+      await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+      await stall.sync();
+      const target = stall.request(usdt(5));
+      await stall.receive(await customer.pay(target), target);
+
+      await stall.updateSettings({ submitDirectly: true });
+      const [report] = await stall.settle();
+
+      expect(report).toMatchObject({ kind: "paid", paid: usdt(5) });
+    }, 120_000);
+
+    test("a dead relayer domain reads as no relayer", async () => {
+      const lookup = relayerFrom("http://127.0.0.1:1/relayer.txt");
+      expect(await lookup()).toBeUndefined();
+    });
 
     test("refuses any call but load and settle, and sends nothing", async () => {
       const nonce = await reads.getTransactionCount({

@@ -170,10 +170,13 @@ export const openWallet = async (options: WalletOptions) => {
   const snapshot = async (): Promise<Snapshot> =>
     (await store.read("snapshot")) ?? emptySnapshot();
 
+  const relayerUrl = async () =>
+    typeof relayer === "function" ? relayer() : relayer;
+
   const route = async (): Promise<{ fee: UsdtAtoms; submit: Submit }> => {
     const { submitDirectly } = await settings();
-    const url = typeof relayer === "function" ? await relayer() : relayer;
-    return url && !submitDirectly
+    const url = submitDirectly ? undefined : await relayerUrl();
+    return url
       ? { fee: RELAY_FEE, submit: relayerSubmit(url) }
       : { fee: NO_FEE, submit: directSubmit(funding, writes) };
   };

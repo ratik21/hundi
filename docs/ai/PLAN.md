@@ -615,6 +615,10 @@ Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bo
 | 2:10 | Stall goes online and taps **Settle** | "The chain proved the cheat. The stall got paid, and the cheater lost twice that." |
 | 2:35 | Stop the relayer and settle directly | "Nothing here depends on me." |
 
+**Relay fee.** Through the relayer a 5 USDT note pays 4.90, and the app shows that. **Submit directly** pays the full 5.
+
+**Video rules.** Whitechain wants each party shown. CROPS wants the moment it matters, which is the 2:35 step with the relayer off.
+
 **Fallbacks.** If the chain or RPC fails, switch to the backup RPC, then show links to transactions settled earlier. If a camera fails, use the laptop webcam. If venue Wi-Fi fails, use a phone hotspot.
 
 ## Appendix G. Prize checklist
@@ -638,6 +642,8 @@ Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bo
 | EF CROPS | Video of at most 3 minutes showing the moment it matters | Upload |
 | EF CROPS | No trackers, and keys stay on the device | Code |
 | EF Anon-RPC | Reads go through Anon-RPC by default | `chain-io.ts` |
+
+The rules place a project in at most one EF prize. The gateway failed the U4 check, so reads are direct for now, and the Anon-RPC row stays unmet.
 
 ## Appendix H. Links
 

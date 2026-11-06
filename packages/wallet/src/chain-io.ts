@@ -59,8 +59,9 @@ export const createWrites = (rpc?: string): Transport =>
 
 /** A lookup, read at submit time, so a restarted tunnel needs no new build. */
 export const relayerFrom = (file: string) => async () => {
-  const response = await fetch(file, { cache: "no-store" });
-  const url = response.ok ? (await response.text()).trim() : "";
+  // A missing file or a dead domain means no relayer, never a failed settle.
+  const response = await fetch(file, { cache: "no-store" }).catch(() => null);
+  const url = response?.ok ? (await response.text()).trim() : "";
   return url.startsWith("https://") ? url : undefined;
 };
 
