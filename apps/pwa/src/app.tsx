@@ -20,9 +20,10 @@ const Screens = () => {
     slide("push", () => setRoute(next));
   }, []);
 
-  const home = useCallback(() => {
-    slide("back", () => setRoute("home"));
-    refresh();
+  // Refresh after the route lands, so Home mounts on the old balance and tweens.
+  const home = useCallback(async () => {
+    await slide("back", () => setRoute("home"));
+    await refresh();
   }, [refresh]);
 
   if (error) {

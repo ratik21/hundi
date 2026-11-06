@@ -13,6 +13,7 @@
   --color-bad: #ff6b5e;
   --color-warn: #f5b83d;
   --color-tether: #26a17b;
+  --color-cool: #6ea0ff;
 
   /* The verdict is the one printed thing left: a paper note and a rubber stamp. */
   --color-note-paper: #fcf8ee;
@@ -154,6 +155,47 @@ body {
   border-radius: 0.5rem;
   mix-blend-mode: multiply;
   transform: rotate(-6deg);
+}
+
+/* Reads on camera: marigold with signal, cool the moment it is gone. */
+.glow {
+  position: absolute;
+  inset: -2.5rem -1.25rem;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.glow::before,
+.glow::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transition: opacity 600ms ease-out;
+}
+
+.glow::before {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-accent) 26%, transparent),
+    transparent
+  );
+}
+
+.glow::after {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in srgb, var(--color-cool) 34%, transparent),
+    transparent
+  );
+  opacity: 0;
+}
+
+.glow-offline::before {
+  opacity: 0;
+}
+
+.glow-offline::after {
+  opacity: 1;
 }
 
 .wallet {

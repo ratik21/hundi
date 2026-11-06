@@ -41,6 +41,15 @@ def motions(label, ms=350):
               % (json.dumps(label), json.dumps(label), ms))
 
 
+def balance_frames(label):
+    return js("new Promise(done=>{const m=[...document.querySelectorAll('button')].filter(b=>b.textContent.trim().startsWith(%s));m[0].click();const seen=[],end=performance.now()+900;const look=()=>{const v=document.querySelector('[data-balance]')?.textContent;if(v&&seen.at(-1)!==v)seen.push(v);performance.now()<end?requestAnimationFrame(look):done(seen)};requestAnimationFrame(look)})"
+              % json.dumps(label))
+
+
+def cool_glow():
+    return js("getComputedStyle(document.querySelector('[data-glow]'),'::after').opacity")
+
+
 def see(needle, seconds=45):
     deadline = time.time() + seconds
     while time.time() < deadline:
@@ -57,8 +66,10 @@ def shot(name, wait=0.6, fit=390):
     assert width <= fit, (name, width)
     step[0] += 1
     path = f"{SHOTS}/{step[0]:02d}-{name}.png"
+    size = js("({width:innerWidth,height:innerHeight})")
+    clip = {"x": 0, "y": 0, "scale": 1, **size}
     with open(path, "wb") as file:
-        file.write(base64.b64decode(cdp("Page.captureScreenshot", format="png")["data"]))
+        file.write(base64.b64decode(cdp("Page.captureScreenshot", format="png", clip=clip)["data"]))
 
 
 def screen(width, height, mobile):
@@ -157,6 +168,7 @@ see("Safety deposit", 60)
 see("20 USDT")
 see("2 notes of 5 USDT")
 shot("customer-loaded")
+assert cool_glow() == "0", "the glow should be marigold online"
 tap("Account")
 see("View on explorer")
 shot("customer-account")
@@ -182,7 +194,8 @@ use("customer")
 chain = js("fetch('http://localhost:8599',{method:'POST',body:'{}'}).then(()=>'reached',()=>'blocked')")
 assert chain == "blocked", "the chain is still reachable"
 see("Payments still work")
-shot("customer-offline")
+shot("customer-offline", 0.8)
+assert cool_glow() == "1", "the glow should cool when offline"
 
 request_from("stall")
 shot("stall-request")
@@ -193,7 +206,8 @@ tap("Back")
 see("Ask them to scan")
 pay("customer")
 shot("customer-payment")
-tap("Done")
+frames = balance_frames("Done")
+assert len(frames) > 3 and frames[0] == "$10.00" and frames[-1] == "$5.00", frames
 accept("stall")
 see("You received 5 USDT")
 see("Settle when you have signal")

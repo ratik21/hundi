@@ -4,7 +4,13 @@ import {
   type SettleResult,
   type Wallet,
 } from "@hundi/wallet/wallet";
-import { type ReactNode, useCallback, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import type { Route } from "./app";
 import {
   type Activity,
@@ -16,8 +22,10 @@ import {
   noteGroups,
   receivedTotal,
   settleSummary,
+  tweened,
 } from "./ledger";
 import { Verdict, Working } from "./moments";
+import { reducedMotion } from "./motion";
 import { TAGLINE } from "./pledges";
 import {
   Button,
@@ -37,6 +45,7 @@ const MINUTE = 60n;
 const HOUR = 3600n;
 const ADDRESS_EDGE = 6;
 const NO_NETWORK = "Could not reach the network. Try again.";
+const TWEEN_MS = 450;
 
 const syncedLabel = (syncedAt: bigint): string => {
   if (syncedAt === 0n) {
@@ -204,15 +213,58 @@ const Welcome = ({ go }: { go: (route: Route) => void }) => (
   </>
 );
 
-const Balance = ({ total }: { total: bigint }) => (
-  <section className="animate-lift py-3 text-center">
-    <p className="text-muted font-medium">You can spend</p>
-    <p className="tabular mt-1 text-6xl font-semibold tracking-tight">
-      {dollars(total)}
-    </p>
-    <p className="tabular text-muted mt-1">{formatUsdt(total)} USDT</p>
-  </section>
-);
+const useTween = (target: bigint): bigint => {
+  const [shown, setShown] = useState(target);
+  const latest = useRef(target);
+
+  useEffect(() => {
+    const from = latest.current;
+    const show = (amount: bigint) => {
+      latest.current = amount;
+      setShown(amount);
+    };
+    if (from === target) {
+      return;
+    }
+    if (reducedMotion()) {
+      show(target);
+      return;
+    }
+    const start = performance.now();
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - start) / TWEEN_MS);
+      show(tweened(from, target, progress));
+      if (progress < 1) {
+        frame = requestAnimationFrame(step);
+      }
+    };
+    let frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [target]);
+
+  return shown;
+};
+
+const Balance = ({ online, total }: { online: boolean; total: bigint }) => {
+  const shown = useTween(total);
+  return (
+    <section className="animate-lift relative isolate py-3 text-center">
+      <div
+        aria-hidden="true"
+        className={online ? "glow" : "glow glow-offline"}
+        data-glow
+      />
+      <p className="text-muted font-medium">You can spend</p>
+      <p
+        className="tabular mt-1 text-6xl font-semibold tracking-tight"
+        data-balance
+      >
+        {dollars(shown)}
+      </p>
+      <p className="tabular text-muted mt-1">{formatUsdt(total)} USDT</p>
+    </section>
+  );
+};
 
 const Action = ({
   disabled = false,
@@ -546,7 +598,7 @@ export const Home = ({
         <Welcome go={go} />
       ) : (
         <>
-          <Balance total={groupsTotal(groups)} />
+          <Balance online={online} total={groupsTotal(groups)} />
           <div className="grid grid-cols-4">
             <Action
               glyph="up"

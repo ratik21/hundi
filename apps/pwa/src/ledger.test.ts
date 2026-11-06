@@ -10,6 +10,7 @@ import {
   noteGroups,
   receivedTotal,
   settleSummary,
+  tweened,
 } from "./ledger";
 
 const FIVE = 5_000_000n;
@@ -28,6 +29,27 @@ const held = (name: string, order: number, hops = 0, face = FIVE) =>
 
 const receipt = (name: string, kind: Receipt["kind"], paid: bigint) =>
   ({ at: 0n, kind, noteId: id(name), paid, txHash: TX as Hex }) as Receipt;
+
+describe("tweened", () => {
+  test("lands exactly on both ends, in either direction", () => {
+    expect(tweened(FIVE, 0n, 0)).toBe(FIVE);
+    expect(tweened(FIVE, 0n, 1)).toBe(0n);
+    expect(tweened(0n, FIVE, 1)).toBe(FIVE);
+  });
+
+  test("moves fast first, so a change reads at once", () => {
+    expect(tweened(0n, FIVE, 0.5)).toBeGreaterThan(FIVE / 2n);
+    expect(tweened(FIVE, 0n, 0.5)).toBeLessThan(FIVE / 2n);
+  });
+
+  test("never runs past the target", () => {
+    const steps = Array.from({ length: 21 }, (_, i) =>
+      tweened(0n, FIVE, i / 20)
+    );
+    expect(steps).toEqual(steps.toSorted((a, b) => Number(a - b)));
+    expect(steps.at(-1)).toBe(FIVE);
+  });
+});
 
 describe("noteGroups", () => {
   test("counts held notes by face, largest first", () => {

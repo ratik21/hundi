@@ -33,11 +33,20 @@ export interface SettleSummary {
 const ATOMS_PER_USDT = 1_000_000n;
 const ATOMS_PER_CENT = 10_000n;
 const CENTS_DIGITS = 2;
+const TWEEN_STEPS = 1000;
+const TWEEN_EASE_POWER = 3;
 
 /** One USDT shown as one dollar, the way a wallet shows a stablecoin. */
 export const dollars = (atoms: bigint): string => {
   const cents = (atoms % ATOMS_PER_USDT) / ATOMS_PER_CENT;
   return `$${atoms / ATOMS_PER_USDT}.${String(cents).padStart(CENTS_DIGITS, "0")}`;
+};
+
+/** The amount `progress` (0 to 1) of the way between two, easing out. */
+export const tweened = (from: bigint, to: bigint, progress: number): bigint => {
+  const eased = 1 - (1 - progress) ** TWEEN_EASE_POWER;
+  const step = BigInt(Math.round(eased * TWEEN_STEPS));
+  return from + ((to - from) * step) / BigInt(TWEEN_STEPS);
 };
 
 export const noteGroups = (records: readonly NoteRecord[]): NoteGroup[] => {
