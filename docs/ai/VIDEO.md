@@ -22,7 +22,7 @@ The video must run 2:30 to 2:55. Whitechain wants 2 to 4 minutes that show each 
 | 0:15 | Three wallets side by side. Name each party | "A customer, a merchant, and the merchant's supplier. Everyone synced earlier, and the customer locked up two 5 USDT notes and a safety deposit." |
 | 0:25 | Turn off the Wi-Fi | "From here on there is no network." |
 | 0:35 | Merchant shows a code. Customer scans it and pays. Merchant scans. Big green Paid | "The customer pays. The merchant checks it on the spot, with no network. No gas, no seed phrase, no chain to pick." |
-| 0:55 | Merchant pays the supplier with the same note. Paid | "Now the part nobody else does. The merchant spends that same money onward, still offline. The money moved twice with no network." |
+| 0:55 | Merchant pays the supplier with the same note. Paid | "Now the part nobody else does. The merchant spends that same money again, still offline. The money moved twice with no network." |
 | 1:15 | Customer turns off the guard, then pays note 2 to both the merchant and the supplier. Two green screens | "Now I cheat. Same note, two people. Both look valid, because offline nobody can know yet." |
 | 1:45 | Supplier goes online and taps **Claim**. Paid. Open the receipt on the explorer | "The supplier gets signal first and claims. Real USDT on Whitechain. My relayer paid the gas and took a 10 cent fee from the payout. It simulates every call first, refuses anything that would not pay for itself, and buys its own gas on Uniswap." |
 | 2:00 | Stop the relayer in the terminal. Merchant turns on **Submit directly**, goes online, taps **Claim**. Covered | "Now I switch my backend off. The merchant claims anyway, straight to the chain. Nothing here depends on me." |
