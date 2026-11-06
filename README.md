@@ -114,7 +114,7 @@ See [all known limits](docs/HOW-IT-WORKS.md#all-known-limits).
 
 ## Credits
 
-Built at ETHGlobal Mumbai 2026, with Claude Code. See [How it was built](docs/AI-USE.md) for more info.
+Built at ETHGlobal Mumbai 2026. See [How it was built](docs/AI-USE.md) for more info.
 
 Developer feedback for [Whitechain](WHITECHAIN_FEEDBACK.md) and [Uniswap](FEEDBACK.md).
 

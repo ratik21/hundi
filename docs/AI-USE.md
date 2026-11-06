@@ -1,6 +1,6 @@
 # How I built Hundi
 
-I built Hundi at ETHGlobal Mumbai with Claude Code as my coding agent. I set the direction and made the product and design decisions. Claude Code wrote most of the code.
+I built Hundi at ETHGlobal Mumbai with an AI coding agent. I set the direction and made the product and design decisions. The agent wrote most of the code.
 
 ## Method
 
@@ -36,7 +36,7 @@ The reasoning behind the design is in [`DECISIONS.md`](../DECISIONS.md).
 
 ## Tools
 
-Claude Code (Opus 5.5), pstack skills (`poteto-mode`, `unslop`, `thermo-nuclear-review`), `handoff` for verified session handovers, and `browser-harness` for driving real browsers.
+An AI coding agent, pstack skills (`poteto-mode`, `unslop`, `thermo-nuclear-review`), `handoff` for verified session handovers, and `browser-harness` for driving real browsers.
 
 ## New and reused
 
@@ -46,10 +46,10 @@ Hundi started from an empty repo at this event. Only setup files, Whitechain cha
 
 | Files | Written by | How |
 | --- | --- | --- |
-| `docs/ai/PLAN.md`, `docs/ai/CONVENTIONS.md` | Claude Code, with me directing | Design runs in Appendix C, approved by me |
-| `contracts/`, `packages/` | Claude Code (Opus 5.5) | From Appendix B of the plan |
-| `apps/pwa/` | Claude Code (Opus 5.5), with subagents | From the plan, with my design direction |
-| `apps/relayer/`, `apps/shop/`, `scripts/` | Claude Code (Opus 5.5) | From the plan |
-| `README.md`, `DECISIONS.md`, `docs/` | Claude Code (Opus 5.5), with me directing | From my messages and the plan, checked by me |
+| `docs/ai/PLAN.md`, `docs/ai/CONVENTIONS.md` | AI agent, with me directing | Design runs in Appendix C, approved by me |
+| `contracts/`, `packages/` | AI agent | From Appendix B of the plan |
+| `apps/pwa/` | AI agent, with subagents | From the plan, with my design direction |
+| `apps/relayer/`, `apps/shop/`, `scripts/` | AI agent | From the plan |
+| `README.md`, `DECISIONS.md`, `docs/` | AI agent, with me directing | From my messages and the plan, checked by me |
 
 The key prompts are in [`docs/ai/prompts.md`](ai/prompts.md), and every message is in the [full prompt log](ai/prompt-log.md).
