@@ -3,13 +3,15 @@ import { AddMoney } from "./add-money";
 import { Home } from "./home";
 import { Failure, Working } from "./moments";
 import { Pay } from "./pay";
+import { TAGLINE } from "./pledges";
 import { Receive } from "./receive";
 import { Settings } from "./settings";
+import { PledgeRows, Seal } from "./ui";
 import { useWallet } from "./use-wallet";
 
 export type Route = "add" | "home" | "pay" | "receive" | "settings";
 
-export const App = () => {
+const Screens = () => {
   const [route, setRoute] = useState<Route>("home");
   const { error, online, refresh, sync, view, wallet } = useWallet();
 
@@ -64,3 +66,31 @@ export const App = () => {
     />
   );
 };
+
+const Pitch = () => (
+  <aside className="hidden flex-col gap-8 lg:flex">
+    <p className="flex items-center gap-3 text-2xl font-semibold">
+      <Seal className="size-12" />
+      Hundi
+    </p>
+    <p className="text-5xl/tight font-semibold tracking-tight text-balance xl:text-6xl/tight">
+      {TAGLINE}
+    </p>
+    <PledgeRows />
+  </aside>
+);
+
+/** Layout containment makes the frame the fixed-position root, so sheets stay in the wallet. */
+export const App = () => (
+  <div className="lg:mx-auto lg:grid lg:min-h-dvh lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_24.375rem] lg:items-center lg:gap-16 lg:px-12">
+    <Pitch />
+    <div
+      className="lg:ring-line lg:h-(--app-height) lg:overflow-hidden lg:rounded-(--app-radius) lg:shadow-2xl lg:ring-1 lg:contain-layout"
+      data-wallet
+    >
+      <div className="lg:h-full lg:[scrollbar-width:none] lg:overflow-y-auto">
+        <Screens />
+      </div>
+    </div>
+  </div>
+);

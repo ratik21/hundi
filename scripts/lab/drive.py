@@ -46,14 +46,33 @@ def see(needle, seconds=45):
     raise AssertionError(f"never saw {needle!r}: {text()[:300]}")
 
 
-def shot(name, wait=0.6):
+def shot(name, wait=0.6, fit=390):
     time.sleep(wait)
     width = js("document.documentElement.scrollWidth")
-    assert width <= 390, (name, width)
+    assert width <= fit, (name, width)
     step[0] += 1
     path = f"{SHOTS}/{step[0]:02d}-{name}.png"
     with open(path, "wb") as file:
         file.write(base64.b64decode(cdp("Page.captureScreenshot", format="png")["data"]))
+
+
+def screen(width, height, mobile):
+    cdp("Emulation.setDeviceMetricsOverride", width=width, height=height, deviceScaleFactor=2, mobile=mobile)
+    time.sleep(0.4)
+
+
+def phone():
+    screen(390, 844, True)
+
+
+def laptop():
+    screen(1280, 800, False)
+
+
+def in_wallet(selector):
+    box = js("(()=>{const w=document.querySelector('[data-wallet]').getBoundingClientRect(),r=document.querySelector(%s).getBoundingClientRect();return {width:w.width,inside:r.left>=w.left&&r.right<=w.right&&r.top>=w.top&&r.bottom<=w.bottom}})()"
+             % json.dumps(selector))
+    assert box["width"] == 390 and box["inside"], (selector, box)
 
 
 def request_from(name):
@@ -97,11 +116,21 @@ time.sleep(0.5)
 for name, port in PORTS.items():
     tabs[name] = new_tab(f"http://localhost:{port}/")
     wait_for_load()
-    cdp("Emulation.setDeviceMetricsOverride", width=390, height=844, deviceScaleFactor=2, mobile=True)
+    phone()
     js("Promise.all(['hundi-wallet','hundi-keystore'].map(n=>new Promise(r=>{const q=indexedDB.deleteDatabase(n);q.onsuccess=q.onerror=q.onblocked=r})))")
     cdp("Page.reload", ignoreCache=True)
     wait_for_load()
     time.sleep(2)
+
+use("supplier")
+laptop()
+see("Nothing here yet")
+for pledge in PLEDGES:
+    assert text().count(pledge) == 1, (pledge, text()[:300])
+assert text().count(TAGLINE) == 1, text()[:300]
+in_wallet("main")
+shot("supplier-laptop", fit=1280)
+phone()
 
 use("customer")
 see(TAGLINE)
@@ -123,6 +152,10 @@ see("Safety deposit", 60)
 see("20 USDT")
 see("2 notes of 5 USDT")
 shot("customer-loaded")
+tap("Account")
+see("View on explorer")
+shot("customer-account")
+tap("Close")
 
 use("stall")
 see(TAGLINE)
@@ -236,6 +269,10 @@ tap("Settle")
 see("Covered", 60)
 verdict("Covered")
 shot("stall-covered")
+laptop()
+in_wallet("[data-verdict]")
+shot("stall-covered-laptop", fit=1280)
+phone()
 tap("Done")
 tap("activity")
 see("Covered by a deposit")
@@ -245,6 +282,13 @@ use("customer")
 tap("Refresh")
 see("10 USDT taken", 30)
 shot("customer-after-cheat")
+laptop()
+tap("Account")
+see("View on explorer")
+in_wallet("[role=dialog]")
+shot("customer-account-laptop", fit=1280)
+tap("Close")
+phone()
 
 js("location.hash='#qr-test'")
 see("Hundi QR test")

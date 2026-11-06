@@ -5,7 +5,7 @@ import { PLEDGES } from "./pledges";
 import { useOnline } from "./use-wallet";
 
 const PAGE =
-  "mx-auto flex min-h-dvh max-w-md flex-col gap-5 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]";
+  "mx-auto flex min-h-(--app-height) max-w-md flex-col gap-5 px-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]";
 
 export const Page = ({ children }: { children: ReactNode }) => (
   <main className={PAGE}>{children}</main>

@@ -181,11 +181,20 @@ const OfflineBand = () => (
 
 const Welcome = ({ go }: { go: (route: Route) => void }) => (
   <>
-    <div className="flex flex-col items-center gap-3 pt-4 text-center">
-      <Seal className="size-14" />
-      <h1 className="text-3xl font-semibold text-balance">{TAGLINE}</h1>
+    <div className="flex flex-col gap-5 lg:hidden">
+      <div className="flex flex-col items-center gap-3 pt-4 text-center">
+        <Seal className="size-14" />
+        <h1 className="text-3xl font-semibold text-balance">{TAGLINE}</h1>
+      </div>
+      <PledgeRows />
     </div>
-    <PledgeRows />
+    <div className="hidden flex-col items-center gap-2 py-10 text-center lg:flex">
+      <Seal className="size-16" />
+      <h1 className="mt-3 text-3xl font-semibold">Nothing here yet</h1>
+      <p className="text-muted">
+        Add money once while you have signal. After that, you can pay with none.
+      </p>
+    </div>
     <div className="mt-2 flex flex-col gap-3">
       <Button onClick={() => go("add")}>Add money</Button>
       <Button onClick={() => go("receive")} variant="plain">
@@ -363,7 +372,12 @@ const AccountSheet = ({
         onClick={onClose}
         type="button"
       />
-      <section className="animate-lift bg-surface relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-3xl px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+      <section
+        aria-label="Account"
+        aria-modal="true"
+        className="animate-lift bg-surface relative mx-auto flex w-full max-w-md flex-col gap-4 rounded-t-3xl px-5 pt-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+        role="dialog"
+      >
         <div className="flex items-center gap-3">
           <Seal className="size-11" />
           <div className="min-w-0 flex-1">
@@ -473,6 +487,7 @@ export const Home = ({
     <Page>
       <header className="flex items-center justify-between">
         <button
+          aria-label="Account"
           className="bg-surface border-line flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 font-semibold"
           onClick={() => setAccount(true)}
           type="button"

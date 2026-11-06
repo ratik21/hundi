@@ -31,7 +31,7 @@ export const Verdict = ({
   const { page, stamp, thud } = TONES[tone];
   return (
     <main
-      className={`animate-flood flex min-h-dvh flex-col overflow-hidden px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] text-white ${page}`}
+      className={`animate-flood flex min-h-(--app-height) flex-col overflow-hidden px-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] text-white ${page}`}
       data-verdict={verdict}
     >
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-7">
@@ -79,7 +79,7 @@ export const Working = ({
 }) => (
   <main
     aria-live="polite"
-    className="flex min-h-dvh flex-col items-center justify-center gap-5 px-8 text-center"
+    className="flex min-h-(--app-height) flex-col items-center justify-center gap-5 px-8 text-center"
     role="status"
   >
     <div className="animate-breathe">

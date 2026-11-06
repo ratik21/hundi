@@ -107,6 +107,16 @@
   }
 }
 
+:root {
+  --app-height: 100dvh;
+  --app-radius: 0;
+
+  @variant lg {
+    --app-height: min(100dvh - 3rem, 52.75rem);
+    --app-radius: 2rem;
+  }
+}
+
 html,
 body {
   background: var(--color-base);
