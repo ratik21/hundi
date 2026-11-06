@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs three wallets and the chai shop against a local fork, with hot reload.
+# Runs three wallets and the coffee shop against a local fork, with hot reload.
 # Usage: bun run lab [--ios] [--testnet].
 # --ios opens each wallet in its own iOS Simulator.
 # --testnet uses the real Whitechain testnet and spends test funds from the relayer account.

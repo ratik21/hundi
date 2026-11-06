@@ -27,7 +27,7 @@ The video must run 2:30 to 2:55. Whitechain wants 2 to 4 minutes that show each 
 | 1:45 | Supplier goes online and taps **Claim**. Paid. Open the receipt on the explorer | "The supplier gets signal first and claims. Real USDT on Whitechain. My relayer paid the gas and took a 10 cent fee from the payout. It simulates every call first, refuses anything that would not pay for itself, and buys its own gas on Uniswap." |
 | 2:00 | Stop the relayer in the terminal. Merchant turns on **Submit directly**, goes online, taps **Claim**. Covered | "Now I switch my backend off. The merchant claims anyway, straight to the chain. Nothing here depends on me." |
 | 2:10 | Explorer. The cheater's deposit falls from 20 to 10 | "The chain saw two signatures at one slot. The merchant got paid, and the cheater lost double." |
-| 2:15 | Chai shop till, then `main.ts`, then the CSV | "Any shop can add this in 21 lines. Here is a chai shop taking a payment offline, the customer's view, and the file for the accountant." |
+| 2:15 | Coffee shop till, then `main.ts`, then the CSV | "Any shop can add this in 21 lines. Here is a coffee shop taking a payment offline, the customer's view, and the file for the accountant." |
 | 2:40 | Title card with the URL and repo | "Hundi doesn't stop a double-spend. It makes one provable and costly. Money that works when the network doesn't." |
 
 ## How to record

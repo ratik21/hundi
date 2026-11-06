@@ -33,7 +33,7 @@ Times are IST. This schedule assumes work starts at 13:45 on Fri 6 Nov. Re-check
 | 18:00 | Dinner | Show the pitch to the Whitechain and EF booths |
 | 19:30 to 22:00 | U5 | Full story works in the app on phones |
 | 22:00 to 23:00 | U6 | Live URL and relayer work |
-| 23:00 to 00:00 | U7 | Chai shop app accepts Hundi in about 20 lines |
+| 23:00 to 00:00 | U7 | Coffee shop app accepts Hundi in about 20 lines |
 | 00:00 to 04:00 | Sleep | Agents draft docs only. No contract changes |
 | 04:00 to 05:30 | U8, rehearse | Cold demo runs under 3 minutes |
 | 05:30 to 07:00 | U9 video | Upload accepted |
@@ -259,7 +259,7 @@ This is what the Whitechain Operate track asks for.
 **Files.**
 
 - [x] Create `packages/wallet/src/widget.ts` exporting `mountHundi` and `registerHundiWorker`.
-- [x] Create `apps/shop/`, a separate small chai shop app.
+- [x] Create `apps/shop/`, a separate small coffee shop app.
 
 **Build.**
 
@@ -520,7 +520,7 @@ packages/core      pure, no network or storage, shared by app, relayer and tests
 packages/wallet    thin shell around core
   keystore.ts store.ts chain-io.ts qr.ts wallet.ts widget.ts
 apps/pwa           the wallet app, a static site
-apps/shop          the separate chai shop demo
+apps/shop          the separate coffee shop demo
 apps/relayer       Bun, one route, optional
 contracts          HundiVault.sol P256.sol HundiBytes.sol and fork tests
 vectors            golden.json shared by forge and bun test

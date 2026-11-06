@@ -6,7 +6,7 @@ const orders = document.querySelector("#orders");
 const markOrderPaid = (verdict: Verdict) => {
   if (verdict.ok) {
     const order = document.createElement("li");
-    order.textContent = `Chai and samosa, paid at ${new Date().toLocaleTimeString()}`;
+    order.textContent = `Coffee and croissant, paid at ${new Date().toLocaleTimeString()}`;
     orders?.append(order);
   }
 };

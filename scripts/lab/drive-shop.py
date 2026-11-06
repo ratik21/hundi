@@ -1,4 +1,4 @@
-# Pays the chai shop till from a lab wallet, offline, and saves a screenshot of each state.
+# Pays the coffee shop till from a lab wallet, offline, and saves a screenshot of each state.
 # Usage: bun run lab, then bun run lab:shop. Pass through browser-harness.
 import base64
 import json
@@ -106,7 +106,7 @@ tap("Scan their payment")
 see("Next customer")
 assert js(f"{ROOT}.querySelector('[data-verdict]').dataset.verdict") == "ok"
 shot("till-paid")
-see("Chai and samosa, paid at")
+see("Coffee and croissant, paid at")
 tap("Next customer")
 see("To pay")
 

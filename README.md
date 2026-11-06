@@ -5,7 +5,7 @@
   <p>Pay in USDT from a phone in airplane mode. The person you pay can spend that money again, also offline.<br>If someone spends the same money twice, the contract takes it from their deposit.</p>
   <p>
     <a href="https://hundi-ten.vercel.app"><b>Try the wallet</b></a> ·
-    <a href="https://hundi-chai.vercel.app">Chai shop demo</a> ·
+    <a href="https://hundi-shop.vercel.app">Coffee shop demo</a> ·
     <a href="https://explorer.testnet.whitechain.io/address/0x422d3a4745cfdeb1be99772ef636e827c892c45a">Contract</a> ·
     <a href="docs/HOW-IT-WORKS.md">How it works in detail</a>
   </p>
@@ -31,7 +31,7 @@ For centuries, Indian merchants used the hundi, a paper note that passed from ha
 
 <img src="docs/assets/how-it-works.png" alt="Without Hundi, a payment fails when the network is down. With Hundi, Alice pays Bob by QR, Bob pays Carol with the same money, and Carol claims USDT once online. If Mallory pays Bob and Carol with the same money, both claim, and her deposit loses double.">
 
-Alice added USDT and a safety deposit while online. Now she wants a chai from Bob, and nobody has signal.
+Alice added USDT and a safety deposit while online. Now she wants a coffee from Bob, and nobody has signal.
 
 1. Alice scans Bob's code and shows hers. Bob's phone checks the payment with no network and shows **Paid**.
 2. Bob pays his supplier Carol with the same money, also offline.
@@ -65,13 +65,13 @@ bun run test
 bun run lab
 ```
 
-`bun run lab` starts three wallets and the chai shop on a local fork, at `localhost:5191` to `5194`. The [full setup guide](docs/HOW-IT-WORKS.md#setup-in-full) covers simulators and deploying your own vault.
+`bun run lab` starts three wallets and the coffee shop on a local fork, at `localhost:5191` to `5194`. The [full setup guide](docs/HOW-IT-WORKS.md#setup-in-full) covers simulators and deploying your own vault.
 
 ## Architecture
 
-<img src="docs/assets/architecture.png" alt="On the phone, the wallet app and chai shop use the wallet library and the offline payment rules, which work with no network. Once online, the wallet claims through the optional relayer, or directly, to the HundiVault contract. The relayer buys its own gas on Uniswap v3.">
+<p align="center"><img src="docs/assets/architecture.png" width="78%" alt="The phone works with no network. Once online it claims through the optional relayer, or directly, to the HundiVault contract. The relayer buys its gas on Uniswap v3."></p>
 
-Each box names its folder in this repo.
+The wallet is in `apps/pwa`, the coffee shop in `apps/shop`, and the shared logic in `packages`. The relayer is in `apps/relayer` and the vault in `contracts`.
 
 ## Built with
 
