@@ -211,13 +211,13 @@ describe("whenLabel", () => {
   const noon = new Date(2026, 10, 7, 12, 12).getTime();
 
   test("gives a time for today", () => {
-    expect(whenLabel(noon, noon + 1000)).toStartWith("Today ");
+    expect(whenLabel(noon, noon + 1000)).toContain("12");
   });
 
   test("gives a date before today", () => {
     const earlier = new Date(2026, 10, 6, 12, 12).getTime();
-    expect(whenLabel(earlier, noon)).not.toStartWith("Today");
     expect(whenLabel(earlier, noon)).toContain("6");
+    expect(whenLabel(earlier, noon)).not.toContain("12");
   });
 });
 

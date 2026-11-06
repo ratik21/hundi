@@ -389,10 +389,9 @@ const ActivityRow = ({ line }: { line: Activity }) => {
         {detail && <p className="text-muted text-sm">{detail}</p>}
         <p className="text-muted text-sm">
           {facts.join(" · ")}
-          {facts.length > 0 && line.receipt && " · "}
           {line.receipt && (
             <a
-              className="whitespace-nowrap underline"
+              className="block underline"
               href={receiptUrl(line.receipt)}
               rel="noreferrer"
               target="_blank"

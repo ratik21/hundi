@@ -71,11 +71,11 @@ export const shortKey = (key: PublicKey): string => {
 const senderOf = ({ header, hops }: Note): PublicKey =>
   hops.at(-2)?.to ?? header.owner;
 
-/** "Today 12:12" for today, "6 Nov" before that. */
+/** "12:12" for today, "6 Nov" before that. */
 export const whenLabel = (at: number, now: number): string => {
   const date = new Date(at);
   return date.toDateString() === new Date(now).toDateString()
-    ? `Today ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+    ? date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
     : date.toLocaleDateString([], { day: "numeric", month: "short" });
 };
 
