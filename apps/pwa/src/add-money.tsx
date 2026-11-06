@@ -139,7 +139,7 @@ export const AddMoney = ({
           detail={`${STALL_DEPOSIT} USDT deposit, nothing to spend`}
           onPick={() => setAmounts(stall)}
           picked={is(stall)}
-          title="For my stall"
+          title="For my shop"
           total={STALL_DEPOSIT}
           why="Take payments and pass them on."
         />
