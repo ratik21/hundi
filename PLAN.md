@@ -636,8 +636,8 @@ Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bo
 | ETHGlobal | Live deployment anyone can open | URL |
 | ETHGlobal | Public repo with steady commits | GitHub history |
 | ETHGlobal | Video of 2 to 4 minutes, 720p or higher, own voice, no music, not sped up, not filmed on a phone | Upload |
-| ETHGlobal | AI attribution by file, with specs, prompts and plans in the repo | `README.md`, `docs/ai/` |
-| ETHGlobal | State what is reused from Cleared and what is new | `README.md` |
+| ETHGlobal | AI attribution by file, with specs, prompts and plans in the repo | `docs/AI-USE.md`, `docs/ai/` |
+| ETHGlobal | State what is reused from Cleared and what is new | `docs/AI-USE.md` |
 | Whitechain | Contracts deployed and verified on chain 1874 | Explorer link |
 | Whitechain | USDT payment in the main flow, with the link in the README | `README.md` |
 | Whitechain | A line on why this needs on-chain settlement | `README.md` |
