@@ -221,7 +221,7 @@ If 618 bytes fails to scan, lower `MAX_HOPS` to 2, which gives 362 bytes. The de
 
 **You see.**
 
-- [ ] The full demo in Appendix F works on the real devices with airplane mode on. Evidence is a recording.
+- [ ] The full demo in Appendix F works on the real devices with airplane mode on. Evidence is a recording. So far one real pair run: an iPhone in airplane mode paid laptop Chrome with real cameras, and the hosted relayer settled it. See `docs/ai/evidence/wallet-paid-real-camera.png`, `docs/ai/evidence/wallet-iphone-airplane-after-paying.png` and [0x13d4...e589](https://explorer.testnet.whitechain.io/tx/0x13d45e60b0a2446c156cdda4e6e834cc39cd19bae3df4b873cd366d3aeaee589).
 
 **Review gate.**
 
