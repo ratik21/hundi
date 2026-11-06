@@ -1,5 +1,5 @@
 import { fundLabWallet, LAB_URL } from "@hundi/wallet/lab";
-import type { NoteRecord, Settings } from "@hundi/wallet/store";
+import type { NoteRecord, Receipt, Settings } from "@hundi/wallet/store";
 import { openWallet, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useEffect, useState } from "react";
 import { createReads, relayerUrl, writes } from "./network";
@@ -7,6 +7,7 @@ import { createReads, relayerUrl, writes } from "./network";
 export interface WalletView {
   deposit: bigint;
   notes: readonly NoteRecord[];
+  receipts: readonly Receipt[];
   settings: Settings;
   syncedAt: bigint;
 }
@@ -15,13 +16,14 @@ const describe = (cause: unknown): string =>
   cause instanceof Error ? cause.message : String(cause);
 
 const readView = async (wallet: Wallet): Promise<WalletView> => {
-  const [deposit, notes, settings, snapshot] = await Promise.all([
+  const [deposit, notes, receipts, settings, snapshot] = await Promise.all([
     wallet.deposit(),
     wallet.notes(),
+    wallet.receipts(),
     wallet.settings(),
     wallet.snapshot(),
   ]);
-  return { deposit, notes, settings, syncedAt: snapshot.syncedAt };
+  return { deposit, notes, receipts, settings, syncedAt: snapshot.syncedAt };
 };
 
 export const useOnline = (): boolean => {
