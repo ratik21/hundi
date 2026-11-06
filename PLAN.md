@@ -153,20 +153,20 @@ This is the highest risk on the device side. Run it in parallel, on throwaway pa
 
 **Files.**
 
-- [ ] Create `apps/pwa/` with Vite, React and `vite-plugin-pwa`.
-- [ ] Create `packages/wallet/src/qr.ts` using `qrcode` to draw and `jsqr` to read. Do not use `BarcodeDetector`, because iOS Safari lacks it.
-- [ ] Create `packages/wallet/src/keystore.ts` with a non-extractable WebCrypto P-256 key stored in IndexedDB.
+- [x] Create `apps/pwa/` with Vite, React and `vite-plugin-pwa`.
+- [x] Create `packages/wallet/src/qr.ts` using `qrcode` to draw and `jsqr` to read. Do not use `BarcodeDetector`, because iOS Safari lacks it.
+- [x] Create `packages/wallet/src/keystore.ts` with a non-extractable WebCrypto P-256 key stored in IndexedDB.
 
 **Build.**
 
-- [ ] Deploy the shell to a public HTTPS URL now. The camera and service worker both need a secure origin.
-- [ ] Add a test page that signs 618 random bytes and shows them as a QR, and a scanner that verifies the signature.
+- [x] Deploy the shell to a public HTTPS URL now. The camera and service worker both need a secure origin.
+- [x] Add a test page that signs 618 random bytes and shows them as a QR, and a scanner that verifies the signature.
 
 **You see.**
 
 - [ ] Both phones load the app, go into airplane mode, close and reopen it, and it still runs. Evidence is a photo of each.
-- [ ] A 618-byte QR, the size of a four-hop payment, scans phone to phone within 5 seconds. Evidence is a short video.
-- [ ] The signature verifies on the receiving phone with no network. Evidence is the on-screen result.
+- [ ] A 618-byte QR, the size of a four-hop payment, scans phone to phone within 5 seconds. Evidence is a short video. So far laptop to iPhone took 3.39 s in airplane mode and iPhone to laptop took 2.67 s. See `docs/ai/evidence/`. Phone to phone needs a second phone.
+- [x] The signature verifies on the receiving phone with no network. Evidence is `docs/ai/evidence/qr-laptop-to-iphone-618-airplane.png`.
 
 If 618 bytes fails to scan, lower `MAX_HOPS` to 2, which gives 362 bytes. The demo needs only 2 hops.
 
