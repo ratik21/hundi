@@ -1,6 +1,7 @@
 import { drawQr } from "@hundi/wallet/qr";
 import { startScan } from "@hundi/wallet/scanner";
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { PLEDGES } from "./pledges";
 import { useOnline } from "./use-wallet";
 
 const PAGE =
@@ -59,20 +60,29 @@ export const RowIcon = ({
   </span>
 );
 
+const SHIELD = "M12 3l7 3v5.5c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5V6z";
+
 const GLYPHS = {
+  bolt: "M13 3L5 14h6l-1 7 8-11h-6z",
   check: "M5 12.5l4.5 4.5L19 7.5",
+  coins:
+    "M15 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0zM21 12a6 6 0 0 1-9 5.2M12 6.8A6 6 0 0 1 21 12",
   down: "M12 5v14M6 13l6 6 6-6",
+  lock: "M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z",
   plus: "M12 5v14M5 12h14",
-  shield: "M12 3l7 3v5.5c0 4.4-3 7.7-7 9.5-4-1.8-7-5.1-7-9.5V6z",
+  shield: SHIELD,
   up: "M12 19V5M6 11l6-6 6 6",
+  verified: `${SHIELD}M8.8 12l2.3 2.3 4.2-4.3`,
 };
+
+export type GlyphName = keyof typeof GLYPHS;
 
 export const Glyph = ({
   className = "size-5",
   name,
 }: {
   className?: string;
-  name: keyof typeof GLYPHS;
+  name: GlyphName;
 }) => (
   <svg
     aria-hidden="true"
@@ -86,6 +96,22 @@ export const Glyph = ({
   >
     <path d={GLYPHS[name]} />
   </svg>
+);
+
+export const PledgeRows = () => (
+  <ul className="flex flex-col gap-4">
+    {PLEDGES.map(({ glyph, line, title }) => (
+      <li className="flex items-center gap-3" key={title}>
+        <RowIcon tone="text-accent">
+          <Glyph name={glyph} />
+        </RowIcon>
+        <div className="min-w-0">
+          <p className="font-semibold">{title}</p>
+          <p className="text-muted text-sm text-pretty">{line}</p>
+        </div>
+      </li>
+    ))}
+  </ul>
 );
 
 export const Plane = ({ className = "size-5" }: { className?: string }) => (

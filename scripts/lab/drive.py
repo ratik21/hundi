@@ -8,6 +8,8 @@ import time
 SHOTS = ".lab/shots"
 os.makedirs(SHOTS, exist_ok=True)
 PORTS = {"customer": 5191, "stall": 5192, "supplier": 5193}
+TAGLINE = "Money that works when the network doesn't."
+PLEDGES = ("Pay in seconds", "Trusted with no network", "Cheating costs double", "Yours alone")
 offline = [False]
 tabs = {}
 step = [0]
@@ -102,7 +104,9 @@ for name, port in PORTS.items():
     time.sleep(2)
 
 use("customer")
-see("Nothing here yet")
+see(TAGLINE)
+for pledge in PLEDGES:
+    see(pledge)
 shot("customer-empty")
 tap("Add money")
 see("Available to add")
@@ -121,7 +125,7 @@ see("2 notes of 5 USDT")
 shot("customer-loaded")
 
 use("stall")
-see("Nothing here yet")
+see(TAGLINE)
 tap("Add money")
 see("Available to add")
 tap("For my stall")

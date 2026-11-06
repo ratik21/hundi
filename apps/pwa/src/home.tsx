@@ -18,6 +18,7 @@ import {
   settleSummary,
 } from "./ledger";
 import { Verdict, Working } from "./moments";
+import { TAGLINE } from "./pledges";
 import {
   Button,
   Card,
@@ -25,6 +26,7 @@ import {
   Notice,
   Page,
   Plane,
+  PledgeRows,
   RowIcon,
   Seal,
   TokenIcon,
@@ -179,20 +181,17 @@ const OfflineBand = () => (
 
 const Welcome = ({ go }: { go: (route: Route) => void }) => (
   <>
-    <div className="flex flex-col items-center gap-2 py-10 text-center">
-      <Seal className="size-16" />
-      <h1 className="mt-3 text-3xl font-semibold">Nothing here yet</h1>
-      <p className="text-muted">
-        Add money once while you have signal. After that, you can pay with none.
-      </p>
+    <div className="flex flex-col items-center gap-3 pt-4 text-center">
+      <Seal className="size-14" />
+      <h1 className="text-3xl font-semibold text-balance">{TAGLINE}</h1>
     </div>
-    <Button onClick={() => go("add")}>Add money</Button>
-    <Button onClick={() => go("receive")} variant="plain">
-      Receive
-    </Button>
-    <p className="text-muted text-center text-sm">
-      Only getting paid? Receive works right away.
-    </p>
+    <PledgeRows />
+    <div className="mt-2 flex flex-col gap-3">
+      <Button onClick={() => go("add")}>Add money</Button>
+      <Button onClick={() => go("receive")} variant="plain">
+        Receive
+      </Button>
+    </div>
   </>
 );
 

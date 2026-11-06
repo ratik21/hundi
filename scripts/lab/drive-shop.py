@@ -11,6 +11,7 @@ WALLET = "http://localhost:5191/"
 STALL = "http://localhost:5192/"
 SHOP = "http://localhost:5194/"
 ROOT = "document.querySelector('#till')?.shadowRoot"
+TAGLINE = "Money that works when the network doesn't."
 offline = [False]
 tabs = {}
 step = [0]
@@ -70,7 +71,7 @@ time.sleep(0.5)
 
 open_fresh("customer", WALLET, 390, 844)
 use("customer")
-see("Nothing here yet")
+see(TAGLINE)
 tap("Add money")
 see("Available to add")
 tap("Add 30 USDT")
@@ -78,7 +79,7 @@ see("2 notes of 5 USDT", 60)
 
 open_fresh("stall", STALL, 390, 844)
 use("stall")
-see("Nothing here yet")
+see(TAGLINE)
 
 open_fresh("shop", SHOP, 1280, 800)
 use("shop")
