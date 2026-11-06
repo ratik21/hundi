@@ -100,7 +100,7 @@ The till has a merchant view and a customer view. It works in airplane mode afte
 
 ## How gas gets paid
 
-The payer never holds WBT, writes down a seed phrase, or sees a chain name. The relayer pays the gas and takes a 0.10 USDT fee out of the payout, so a 5 USDT note pays 4.90. Measured gas cost is about 0.044 USDT for a settle and 0.074 USDT for a load.
+The payer never holds WBT or writes down a seed phrase, and no payment screen names a chain. The network shows only behind a tap, on the Wallet sheet. The relayer pays the gas and takes a 0.10 USDT fee out of the payout, so a 5 USDT note pays 4.90. Measured gas cost is about 0.044 USDT for a settle and 0.074 USDT for a load.
 
 The relayer's WBT comes from the Whitechain faucet. It earns USDT and spends WBT, so today its operator refills it by hand.
 

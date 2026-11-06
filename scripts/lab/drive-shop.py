@@ -90,6 +90,7 @@ shot("till-online")
 offline[0] = True
 use("shop")
 see("Payments still work")
+assert not js(f"{ROOT}.querySelector('.offline').hidden"), "the offline band should show"
 shot("till-offline")
 
 use("customer")

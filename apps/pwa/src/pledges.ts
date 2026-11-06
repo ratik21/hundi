@@ -27,7 +27,7 @@ export const PLEDGES: readonly Pledge[] = [
   },
   {
     glyph: "lock",
-    line: "No seed phrase, no account, no server in the middle.",
+    line: "No seed phrase, no account. Your keys stay on this phone.",
     title: "Yours alone",
   },
 ];

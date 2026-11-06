@@ -72,7 +72,7 @@ export const AddMoney = ({
   const [funds, setFunds] = useState<bigint | null>(null);
   const [busy, setBusy] = useState(false);
   const [problem, setProblem] = useState("");
-  const { copy, toast } = useCopy(wallet.address);
+  const { copy, label } = useCopy(wallet.address);
 
   const checkFunds = useCallback(() => {
     wallet.funds().then(setFunds, () => setFunds(null));
@@ -193,7 +193,7 @@ export const AddMoney = ({
           </p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             <Button onClick={copy} variant="plain">
-              Copy
+              {label}
             </Button>
             <Button onClick={checkFunds} variant="plain">
               Check again
@@ -215,7 +215,6 @@ export const AddMoney = ({
           Add {total} USDT
         </Button>
       </div>
-      {toast}
     </Screen>
   );
 };

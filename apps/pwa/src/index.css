@@ -31,7 +31,6 @@
   --animate-lift: lift 260ms ease-out both;
   --animate-sheet: sheet 280ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
   --animate-fade: fade 280ms ease-out backwards;
-  --animate-toast: toast 1400ms ease-out both;
   --animate-stamp: stamp 300ms 260ms cubic-bezier(0.3, 0.7, 0.3, 1.1) both;
   --animate-thud: thud 240ms 420ms ease-out both;
   --animate-shake: shake 360ms 420ms ease-in-out both;
@@ -63,21 +62,6 @@
 
   @keyframes fade {
     from {
-      opacity: 0;
-    }
-  }
-
-  @keyframes toast {
-    0% {
-      opacity: 0;
-      translate: 0 -8px;
-    }
-    12%,
-    85% {
-      opacity: 1;
-      translate: 0 0;
-    }
-    100% {
       opacity: 0;
     }
   }

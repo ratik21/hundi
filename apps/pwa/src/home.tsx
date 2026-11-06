@@ -401,7 +401,7 @@ const shortAddress = (address: string): string =>
   `${address.slice(0, ADDRESS_EDGE)}…${address.slice(-ADDRESS_EDGE + 2)}`;
 
 /** The crypto details live here, one tap away from a screen that needs none. */
-const AccountSheet = ({
+const WalletSheet = ({
   address,
   go,
   onClose,
@@ -412,50 +412,47 @@ const AccountSheet = ({
   onClose: () => void;
   online: boolean;
 }) => {
-  const { copy, toast } = useCopy(address);
+  const { copy, label } = useCopy(address);
   const explorer = whitechainSepolia.blockExplorers.default.url;
   return (
-    <>
-      <Sheet label="Account" onClose={onClose}>
-        <div className="flex items-center gap-3">
-          <Seal className="size-11" />
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold">Account</p>
-            <p className="text-muted tabular font-mono text-sm" data-address>
-              {shortAddress(address)}
-            </p>
-          </div>
-          <button
-            className="bg-raised rounded-full px-4 py-2 text-sm font-semibold"
-            onClick={copy}
-            type="button"
-          >
-            Copy
-          </button>
+    <Sheet label="Wallet" onClose={onClose}>
+      <div className="flex items-center gap-3">
+        <Seal className="size-11" />
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold">Wallet</p>
+          <p className="text-muted tabular font-mono text-sm" data-address>
+            {shortAddress(address)}
+          </p>
         </div>
-        <div className="border-line flex items-center justify-between border-t pt-4 text-sm">
-          <span className="text-muted">Network</span>
-          <span className="flex items-center gap-1.5 font-medium">
-            <span
-              className={`size-2 rounded-full ${online ? "bg-good" : "bg-muted"}`}
-            />
-            {whitechainSepolia.name}
-          </span>
-        </div>
-        <a
-          className="text-sm font-semibold underline"
-          href={`${explorer}/address/${address}`}
-          rel="noreferrer"
-          target="_blank"
+        <button
+          className="bg-raised rounded-full px-4 py-2 text-sm font-semibold"
+          onClick={copy}
+          type="button"
         >
-          View on explorer
-        </a>
-        <Button onClick={() => go("settings")} variant="plain">
-          Settings
-        </Button>
-      </Sheet>
-      {toast}
-    </>
+          {label}
+        </button>
+      </div>
+      <div className="border-line flex items-center justify-between border-t pt-4 text-sm">
+        <span className="text-muted">Network</span>
+        <span className="flex items-center gap-1.5 font-medium">
+          <span
+            className={`size-2 rounded-full ${online ? "bg-good" : "bg-muted"}`}
+          />
+          {whitechainSepolia.name}
+        </span>
+      </div>
+      <a
+        className="text-sm font-semibold underline"
+        href={`${explorer}/address/${address}`}
+        rel="noreferrer"
+        target="_blank"
+      >
+        View on explorer
+      </a>
+      <Button onClick={() => go("settings")} variant="plain">
+        Settings
+      </Button>
+    </Sheet>
   );
 };
 
@@ -527,13 +524,13 @@ export const Home = ({
     <Page>
       <header className="flex items-center justify-between">
         <button
-          aria-label="Account"
+          aria-label="Wallet"
           className="bg-surface border-line flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 font-semibold"
           onClick={() => setAccount(true)}
           type="button"
         >
           <Seal className="size-7" />
-          Account
+          Wallet
           <svg
             aria-hidden="true"
             className="text-muted size-4"
@@ -699,7 +696,7 @@ export const Home = ({
       </footer>
 
       {account && (
-        <AccountSheet
+        <WalletSheet
           address={wallet.address}
           go={go}
           onClose={() => setAccount(false)}
