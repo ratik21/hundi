@@ -54,22 +54,23 @@ Any stranger's phone must be able to redeem money at a place no operator can shu
 You need [Bun](https://bun.sh) 1.4.4 and [Foundry](https://getfoundry.sh) 1.9.0.
 
 ```sh
-git clone --recurse-submodules https://github.com/ratik21/hundi && cd hundi
-bun install && bun run test
-bun run lab   # three wallets and the chai shop on a local fork, at localhost:5191 to 5194
+git clone --recurse-submodules https://github.com/ratik21/hundi
+cd hundi && bun install
+bun run test
+bun run lab
 ```
 
-[Setup in full](docs/HOW-IT-WORKS.md#setup-in-full) covers simulators and deploying your own vault.
+`bun run lab` starts three wallets and the chai shop on a local fork, at `localhost:5191` to `5194`. [Setup in full](docs/HOW-IT-WORKS.md#setup-in-full) covers simulators and deploying your own vault.
 
 ## Architecture
 
 ```text
-contracts          HundiVault: holds USDT, mints notes, pays claims, takes deposits. No owner
-packages/core      Pure logic: byte layouts, the offline acceptance rule
-packages/wallet    Keys, storage, chain reads, QR, and the drop-in widget
-apps/pwa           The wallet, a static PWA
-apps/shop          A separate chai shop that uses the widget
-apps/relayer       Optional. Pays gas and takes a 0.10 USDT fee
+contracts        HundiVault: USDT escrow and deposits. No owner
+packages/core    Pure logic: bytes, the offline rule
+packages/wallet  Keys, storage, QR, chain reads, the widget
+apps/pwa         The wallet, a static PWA
+apps/shop        A chai shop that uses the widget
+apps/relayer     Optional. Pays gas for a 0.10 USDT fee
 ```
 
 ## Built with
