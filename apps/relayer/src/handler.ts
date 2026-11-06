@@ -32,6 +32,8 @@ const refuse = (status: number, error: string): Response =>
 
 export interface RelayerDeps {
   account: Account;
+  /** Keeps work running after the reply has gone. */
+  after: (work: Promise<unknown>) => void;
   limiter: RateLimiter;
   log: (fields: object, message: string) => void;
   reads: PublicClient;
@@ -49,7 +51,7 @@ const serial = () => {
 };
 
 export const createHandler = (deps: RelayerDeps) => {
-  const { account, limiter, log, reads, wallet } = deps;
+  const { account, after, limiter, log, reads, wallet } = deps;
   const inTurn = serial();
 
   const submit = async (data: Hex): Promise<Response> => {
@@ -83,10 +85,14 @@ export const createHandler = (deps: RelayerDeps) => {
       })
     );
     log({ earned, hash }, "sent");
-    // A failed refill must never fail the settle that was already sent.
-    await inTurn(() => refill(deps))
-      .then((swap) => swap && log({ swap }, "refilled gas"))
-      .catch((cause: Error) => log({ reason: cause.message }, "refill failed"));
+    // After the reply, so a slow or failed refill can never cost a caller the hash.
+    after(
+      refill({ ...deps, send: inTurn })
+        .then((swap) => swap && log({ swap }, "refilled gas"))
+        .catch((cause: Error) =>
+          log({ reason: cause.message }, "refill failed")
+        )
+    );
     return json(200, { hash });
   };
 

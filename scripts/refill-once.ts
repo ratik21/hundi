@@ -34,7 +34,10 @@ const wallet = createWalletClient({
 });
 
 const before = await reads.getBalance({ address: account.address });
-const hash = await refill({ account, reads, wallet }, ANY_BALANCE);
+const hash = await refill(
+  { account, reads, send: (task) => task(), wallet },
+  ANY_BALANCE
+);
 const after = await reads.getBalance({ address: account.address });
 
 console.log(`gained   ${after - before} wei, after gas`);

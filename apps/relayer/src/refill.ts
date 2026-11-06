@@ -15,6 +15,7 @@ export const ROUTER = "0xe208cc685cd95d56e8ec6dec9816476567fc6962";
 const WRAPPED_WBT = "0x4200000000000000000000000000000000000006";
 const POOL_FEE = 3000;
 const DEADLINE_SECONDS = 300n;
+const RECEIPT_TIMEOUT_MS = 30_000;
 /** SwapRouter02 reads this recipient as itself, so it can unwrap in the same call. */
 const ROUTER_ITSELF = "0x0000000000000000000000000000000000000002";
 
@@ -28,6 +29,8 @@ const routerAbi = parseAbi([
 export interface RefillDeps {
   account: Account;
   reads: PublicClient;
+  /** Runs a send in turn with the relayer's other sends. Never held while waiting. */
+  send: <T>(task: () => Promise<T>) => Promise<T>;
   wallet: WalletClient;
 }
 
@@ -59,13 +62,23 @@ const swapCalls = (atoms: bigint, recipient: `0x${string}`) => {
 };
 
 /**
- * Turns earned USDT fees into WBT through Uniswap once gas runs low. Every call
- * is simulated first, and sends nothing that would fail.
+ * Turns the relayer's USDT into WBT through Uniswap once gas runs low. Every call
+ * is simulated first, and a revert after that throws.
  */
 export const refill = async (
-  { account, reads, wallet }: RefillDeps,
+  { account, reads, send, wallet }: RefillDeps,
   below = REFILL_BELOW_WEI
 ): Promise<Hash | undefined> => {
+  const landed = async (hash: Hash) => {
+    const { status } = await reads.waitForTransactionReceipt({
+      hash,
+      timeout: RECEIPT_TIMEOUT_MS,
+    });
+    if (status !== "success") {
+      throw new Error(`reverted: ${hash}`);
+    }
+    return hash;
+  };
   const [wbt, usdt, allowance] = await Promise.all([
     reads.getBalance({ address: account.address }),
     reads.readContract({
@@ -93,9 +106,7 @@ export const refill = async (
       args: [ROUTER, atoms],
       functionName: "approve",
     });
-    await reads.waitForTransactionReceipt({
-      hash: await wallet.writeContract(request),
-    });
+    await landed(await send(() => wallet.writeContract(request)));
   }
   const now = BigInt(Math.floor(Date.now() / 1000));
   const { request } = await reads.simulateContract({
@@ -105,7 +116,5 @@ export const refill = async (
     args: [now + DEADLINE_SECONDS, swapCalls(atoms, account.address)],
     functionName: "multicall",
   });
-  const hash = await wallet.writeContract(request);
-  await reads.waitForTransactionReceipt({ hash });
-  return hash;
+  return landed(await send(() => wallet.writeContract(request)));
 };

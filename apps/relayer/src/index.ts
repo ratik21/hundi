@@ -4,7 +4,7 @@ import { relayerFromEnv } from "./from-env";
 
 const DEFAULT_PORT = 8787;
 
-const handle = await relayerFromEnv();
+const handle = await relayerFromEnv(() => undefined);
 
 serve({
   fetch: (request, self) =>

@@ -1,7 +1,8 @@
 /** Runs the relayer as a Vercel function at /api/submit. */
+import { waitUntil } from "@vercel/functions";
 import { relayerFromEnv } from "./from-env";
 
-const ready = relayerFromEnv();
+const ready = relayerFromEnv(waitUntil);
 
 const route = async (request: Request) => {
   const handle = await ready;

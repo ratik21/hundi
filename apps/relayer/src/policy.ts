@@ -7,7 +7,7 @@ import {
   type RpcLog,
 } from "viem";
 
-/** The Whitechain pool sat near 73 USDT per WBT, so this errs in the relayer's favour. */
+/** The Whitechain pool sat near 73 USDT per WBT, so gas costs err in the relayer's favour. */
 export const USDT_PER_WBT = 75n;
 /** wei per WBT divided by atoms per USDT. */
 const WEI_PER_ATOM = 10n ** 12n;
@@ -77,7 +77,7 @@ export const refillAtoms = (
     ? REFILL_ATOMS
     : undefined;
 
-/** A fixed floor, so a moved pool cannot sell the relayer's fees cheap. */
+/** A fixed floor, so a moved pool cannot take more than a small part of one swap. */
 export const leastWeiFor = (atoms: bigint): bigint =>
   (atoms * WEI_PER_ATOM * FLOOR_PERCENT) / (USDT_PER_WBT * PERCENT);
 

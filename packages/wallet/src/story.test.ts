@@ -290,6 +290,7 @@ describe.skipIf(!anvil)("Appendix F story", () => {
     const RELAYER_URL = `http://127.0.0.1:${RELAYER_PORT}`;
     const relayerAccount = privateKeyToAccount(generatePrivateKey());
     const sent: object[] = [];
+    const running: Promise<unknown>[] = [];
     let relayer: ReturnType<typeof serve>;
 
     const post = (body: unknown) =>
@@ -305,6 +306,7 @@ describe.skipIf(!anvil)("Appendix F story", () => {
       });
       const handle = createHandler({
         account: relayerAccount,
+        after: (work) => running.push(work),
         limiter: fixedWindowLimiter(1000, 60_000),
         log: (fields) => sent.push(fields),
         reads,
@@ -362,12 +364,19 @@ describe.skipIf(!anvil)("Appendix F story", () => {
       await stall.sync();
       const target = stall.request(usdt(5));
       await stall.receive(await customer.pay(target), target);
+      await Promise.all(running);
+      await control.setBalance({
+        address: relayerAccount.address,
+        value: lowGas,
+      });
       const before = await usdtOf(relayerAccount.address);
       const gasBefore = await reads.getBalance({
         address: relayerAccount.address,
       });
+      sent.length = 0;
 
       const [report] = await stall.settle();
+      await Promise.all(running);
 
       expect(report).toMatchObject({ kind: "paid", paid: usdt(4.9) });
       expect(await usdtOf(relayerAccount.address)).toBe(

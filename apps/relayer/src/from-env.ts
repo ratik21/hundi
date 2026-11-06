@@ -9,7 +9,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { z } from "zod";
-import { createHandler } from "./handler";
+import { createHandler, type RelayerDeps } from "./handler";
 import { fixedWindowLimiter } from "./policy";
 
 const REQUESTS_PER_WINDOW = 20;
@@ -21,7 +21,7 @@ const Env = z.object({
 });
 
 /** Builds the relayer from environment variables. Testnet only. */
-export const relayerFromEnv = async () => {
+export const relayerFromEnv = async (after: RelayerDeps["after"]) => {
   const parsed = Env.safeParse(process.env);
   if (!parsed.success) {
     // Names and rule messages only, never values.
@@ -43,6 +43,7 @@ export const relayerFromEnv = async () => {
   logger.info({ address: account.address }, "relayer up");
   return createHandler({
     account,
+    after,
     limiter: fixedWindowLimiter(REQUESTS_PER_WINDOW, WINDOW_MS),
     log: (fields, message) => logger.info(fields, message),
     reads,
