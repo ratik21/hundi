@@ -25,6 +25,8 @@ I built Hundi at ETHGlobal Mumbai with Claude Code as my coding agent. I set the
 
 ## My decisions
 
+The reasoning behind the design is in [`DECISIONS.md`](../DECISIONS.md).
+
 - Entered Partner Prizes Only, on testnet, with Whitechain, the Ethereum Foundation and Uniswap.
 - Added the relayer's Uniswap refill, and moved the relayer to Vercel.
 - Dropped Anon-RPC after its gateway failed the test.
@@ -48,6 +50,6 @@ Hundi started from an empty repo at this event. Only setup files, Whitechain cha
 | `contracts/`, `packages/` | Claude Code (Opus 5.5) | From Appendix B of the plan |
 | `apps/pwa/` | Claude Code (Opus 5.5), with subagents | From the plan, with my design direction |
 | `apps/relayer/`, `apps/shop/`, `scripts/` | Claude Code (Opus 5.5) | From the plan |
-| `README.md`, `docs/` | Claude Code (Opus 5.5) | Checked against the code and the chain |
+| `README.md`, `DECISIONS.md`, `docs/` | Claude Code (Opus 5.5), with me directing | From my messages and the plan, checked by me |
 
 The key prompts are in [`docs/ai/prompts.md`](ai/prompts.md), and every message is in the [full prompt log](ai/prompt-log.md).
