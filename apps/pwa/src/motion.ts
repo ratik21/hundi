@@ -1,5 +1,19 @@
 import { flushSync } from "react-dom";
 
+let sliding: ViewTransition | undefined;
+
+// A sliding screen takes no hits, so a tap on it lands on <html>. End the slide
+// and hand the tap to whatever is under it, so motion never swallows a tap.
+document.addEventListener("pointerdown", () => sliding?.skipTransition(), true);
+document.addEventListener("click", ({ clientX, clientY, target }) => {
+  if (target === document.documentElement) {
+    document
+      .elementFromPoint(clientX, clientY)
+      ?.closest<HTMLElement>("a, button")
+      ?.click();
+  }
+});
+
 export const reducedMotion = (): boolean =>
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -13,6 +27,6 @@ export const slide = async (
     return;
   }
   document.documentElement.dataset.slide = direction;
-  await document.startViewTransition(() => flushSync(update))
-    .updateCallbackDone;
+  sliding = document.startViewTransition(() => flushSync(update));
+  await sliding.updateCallbackDone;
 };

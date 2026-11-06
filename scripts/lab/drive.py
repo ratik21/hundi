@@ -51,6 +51,14 @@ def cool_glow():
     return js("getComputedStyle(document.querySelector('[data-glow]'),'::after').opacity")
 
 
+def tap_mid_slide():
+    js("new Promise(done=>{document.querySelector('[aria-label=Settings]').click();const look=()=>{const a=document.getAnimations().filter(a=>a.effect.pseudoElement?.includes('view-transition'));if(a.length){a.forEach(x=>x.pause());done()}else requestAnimationFrame(look)};requestAnimationFrame(look)})")
+    box = js("(()=>{const r=document.querySelector('[aria-label=Back]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()")
+    click_at_xy(box["x"], box["y"])
+    time.sleep(0.6)
+    assert js("!!document.querySelector('[data-balance]')"), "a tap during a slide was lost"
+
+
 def see(needle, seconds=45):
     deadline = time.time() + seconds
     while time.time() < deadline:
@@ -283,6 +291,7 @@ see("No note can pay")
 see("What to do next")
 shot("customer-guard-refuses")
 tap("Done")
+tap_mid_slide()
 assert set(motions("Settings")) == {"push-out", "push-in"}
 see("What Hundi stands for")
 for pledge in PLEDGES:
