@@ -56,7 +56,7 @@ The app opens on port 5173. The camera works only on `localhost` or HTTPS, so te
 
 The app needs no server of its own, so `bun run build` gives you a static site you can host anywhere.
 
-To try all three parties with no phones, run `bun run lab`. It starts three wallets and the chai shop on a local fork, with hot reload, at `localhost:5191` to `5194`. `bun run lab --ios` opens each wallet in its own iOS Simulator. `bun run lab:drive` runs the whole demo through the real screens and saves a screenshot of each step in `.lab/shots`. A simulator has no camera, so lab builds pass QR codes through a local relay. Production builds leave that code out. `bun run lab --ios --testnet` runs the same wallets on the real testnet, one simulator each, and spends test funds from the relayer account.
+To try all three parties with no phones, run `bun run lab`. It starts three wallets and the chai shop on a local fork, with hot reload, at `localhost:5191` to `5194`. `bun run lab --ios` opens each wallet in its own iOS Simulator. `bun run lab:drive` runs the whole demo through the real screens and saves a screenshot of each step in `.lab/shots`. `bun run lab:shop` does the same for the chai shop till. `bun run lab:sim` taps the wallet inside the iOS Simulators through `safaridriver`. A simulator has no camera, so lab builds pass QR codes through a local relay. Production builds leave that code out. `bun run lab --ios --testnet` runs the same wallets on the real testnet, one simulator each, and spends test funds from the relayer account.
 
 To deploy your own vault, copy `.env.example` to `.env` and fill it in. Then run the commands below and put the result in `deployments/1874.json`.
 
@@ -102,7 +102,7 @@ The till has a merchant view and a customer view. It works in airplane mode afte
 
 The payer never holds WBT or writes down a seed phrase, and no payment screen names a chain. The network shows only behind a tap, on the Wallet sheet. The relayer pays the gas and takes a 0.10 USDT fee out of the payout, so a 5 USDT note pays 4.90. Measured gas cost is about 0.044 USDT for a settle and 0.074 USDT for a load.
 
-The relayer's WBT comes from the Whitechain faucet. It earns USDT and spends WBT, so today its operator refills it by hand.
+The relayer earns USDT and spends WBT, so it buys its own gas on Uniswap. Below 0.1 WBT it swaps 2 USDT of earned fees on the v3 pool. See [Uniswap](#uniswap).
 
 These checks stop someone draining it:
 
@@ -112,6 +112,21 @@ These checks stop someone draining it:
 - It limits each IP address to 20 requests a minute on each running instance.
 
 A call can still revert if the chain changes between simulation and sending. The relayer loses that gas.
+
+## Uniswap
+
+The relayer refills its own gas through the Uniswap v3 `SwapRouter02` on Whitechain, at `0xe208cc685cd95d56e8ec6dec9816476567fc6962`. Its factory is a verified `UniswapV3Factory`.
+
+| What | Where |
+| --- | --- |
+| Swap USDT to wrapped WBT, then unwrap, in one `multicall` | [`refill.ts#L35-L60`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/refill.ts#L35-L60) |
+| Simulate, then send | [`refill.ts#L65-L111`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/refill.ts#L65-L111) |
+| When to refill, and the price floor | [`policy.ts#L72-L82`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/policy.ts#L72-L82) |
+| Runs after each sent call | [`handler.ts#L86-L90`](https://github.com/ratik21/hundi/blob/4d73fbc/apps/relayer/src/handler.ts#L86-L90) |
+
+A real swap on the testnet: [0x257e...2725](https://explorer.testnet.whitechain.io/tx/0x257e04889dbdbe086acff4953a25b8b42fdcaf5de9a97407a4f9115784982725). It spent 2 USDT and gained 0.0263 WBT after gas.
+
+The swap is limited three ways. It runs only below 0.1 WBT, it spends 2 USDT at a time and keeps 2 USDT in reserve, and it reverts below 90% of the relayer's fixed rate. A failed refill is logged and never fails the settle already sent. A fork test runs it against the real pool through the relayer.
 
 ## CROPS
 

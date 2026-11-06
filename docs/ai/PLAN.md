@@ -572,7 +572,7 @@ The judge traced first settle, second settle, strict prefix, prefix extension, n
 | Receiver rejects a note minted after its last sync | U4 | `unknown_note` in the demo | Always sync all devices after `load`, and state this limit |
 | Anon-RPC gateway is down | U8 | Reads hang | Time out, fall back to direct reads, and say so on screen |
 | Venue network fails during the demo | U9 | No signal at judging | The offline half needs none. Use a hotspot and pre-settled links |
-| Faucet or gas runs out | U2 | Relayer below 0.1 WBT | About 1.99 WBT is available now. A settle costs little, so measure it in U2 |
+| Faucet or gas runs out | U2 | Relayer below 0.1 WBT | The relayer swaps 2 USDT of earned fees for WBT on Uniswap. See `apps/relayer/src/refill.ts` |
 
 ## Appendix E. What Hundi cannot prevent, and how to answer judges
 
@@ -648,6 +648,8 @@ Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bo
 | EF CROPS | Video of at most 3 minutes showing the moment it matters | Upload |
 | EF CROPS | No trackers, and keys stay on the device | Code |
 | EF Anon-RPC | Reads go through Anon-RPC by default | `chain-io.ts` |
+| Uniswap | Integrate the Uniswap AMM, with a public repo and a README that points to the code | `apps/relayer/src/refill.ts`, `README.md` |
+| Uniswap | `FEEDBACK.md`, and the developer feedback form with a link to it | `FEEDBACK.md`, form receipt |
 
 The rules place a project in at most one EF prize. The gateway failed the U4 check, so reads are direct for now, and the Anon-RPC row stays unmet.
 
