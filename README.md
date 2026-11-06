@@ -69,14 +69,9 @@ bun run lab
 
 ## Architecture
 
-```text
-contracts        The vault that holds USDT and deposits
-packages/core    Pure logic, including the offline payment check
-packages/wallet  Keys, storage, QR codes and the drop-in widget
-apps/pwa         The wallet app
-apps/shop        A demo chai shop that uses the widget
-apps/relayer     Optional service that pays gas for a fee
-```
+<img src="docs/assets/architecture.png" alt="On the phone, the wallet app and chai shop use the wallet library and the offline payment rules, which work with no network. Once online, the wallet claims through the optional relayer, or directly, to the HundiVault contract. The relayer buys its own gas on Uniswap v3.">
+
+Each box names its folder in this repo.
 
 ## Built with
 

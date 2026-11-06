@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Hundi architecture</title>
+<style>
+  :root { --ink:#111; --paper:#fff; --soft:#555; --seal:#f5b83d; --seal-ink:#1a1405; }
+  * { margin:0; }
+  html,body { background:var(--paper); }
+  svg { display:block; font-family:"Avenir Next","Helvetica Neue",Helvetica,Arial,sans-serif; fill:var(--ink); }
+  .h { font-size:30px; font-weight:700; }
+  .n { font-size:27px; font-weight:600; text-anchor:middle; }
+  .p { font-size:20px; fill:var(--soft); text-anchor:middle; font-family:ui-monospace,Menlo,monospace; }
+  .l { font-size:24px; text-anchor:middle; }
+  .s { font-size:20px; fill:var(--soft); text-anchor:middle; }
+  .zone { fill:none; stroke:var(--ink); stroke-width:3; stroke-dasharray:3 11; stroke-linecap:round; }
+  .box { fill:var(--paper); stroke:var(--ink); stroke-width:3.5; }
+  .line { fill:none; stroke:var(--ink); stroke-width:4.5; stroke-linecap:round; stroke-linejoin:round; }
+  .dash { stroke-dasharray:2 13; }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 760" width="1500" height="760">
+  <defs>
+    <marker id="a" viewBox="0 0 12 12" refX="9" refY="6" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1l9 5-9 5" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+
+  <rect class="zone" x="24" y="24" width="640" height="712" rx="26"/>
+  <text class="h" x="344" y="78" text-anchor="middle">On the phone</text>
+  <text class="s" x="344" y="110">works with no network</text>
+
+  <rect class="box" x="66" y="146" width="262" height="112" rx="18"/>
+  <text class="n" x="197" y="195">Wallet app</text><text class="p" x="197" y="229">apps/pwa</text>
+  <rect class="box" x="360" y="146" width="262" height="112" rx="18"/>
+  <text class="n" x="491" y="195">Chai shop</text><text class="p" x="491" y="229">apps/shop</text>
+
+  <path class="line" d="M197 262V330" marker-end="url(#a)"/>
+  <path class="line" d="M491 262V330" marker-end="url(#a)"/>
+
+  <rect class="box" x="66" y="340" width="556" height="124" rx="18"/>
+  <text class="n" x="344" y="392">Wallet and drop-in widget</text>
+  <text class="s" x="344" y="422">keys, storage, QR codes</text>
+  <text class="p" x="344" y="450">packages/wallet</text>
+
+  <path class="line" d="M344 468V536" marker-end="url(#a)"/>
+
+  <rect class="box" x="66" y="546" width="556" height="124" rx="18"/>
+  <text class="n" x="344" y="598">Offline payment rules</text>
+  <text class="s" x="344" y="628">checks every payment on the phone</text>
+  <text class="p" x="344" y="656">packages/core</text>
+
+  <path class="line" d="M626 420H918" marker-end="url(#a)"/>
+  <text class="l" x="800" y="398">Claim</text><text class="s" x="800" y="456">once online</text>
+
+  <rect class="box" x="928" y="300" width="262" height="140" rx="18"/>
+  <text class="n" x="1059" y="352">Relayer</text><text class="s" x="1059" y="384">optional, pays gas</text><text class="p" x="1059" y="416">apps/relayer</text>
+
+  <path class="line" d="M1194 370H1270V206" marker-end="url(#a)"/>
+  <text class="l" x="1346" y="300">Sends the</text><text class="l" x="1346" y="330">claim</text>
+
+  <path class="line dash" d="M626 366H712V130H1140" marker-end="url(#a)"/>
+  <text class="l" x="926" y="106">Submit directly</text><text class="s" x="926" y="166">with the relayer switched off</text>
+
+  <rect class="box" x="1150" y="56" width="326" height="146" rx="18" style="fill:var(--seal)"/>
+  <text class="n" x="1313" y="110" style="fill:var(--seal-ink)">HundiVault</text>
+  <text class="s" x="1313" y="142" style="fill:var(--seal-ink)">USDT and deposits, no owner</text>
+  <text class="p" x="1313" y="172" style="fill:var(--seal-ink)">contracts</text>
+
+  <path class="line" d="M1059 444V546" marker-end="url(#a)"/>
+  <text class="l" x="1000" y="500" style="text-anchor:end">Buys its own gas</text>
+  <rect class="box" x="928" y="556" width="262" height="114" rx="18"/>
+  <text class="n" x="1059" y="606">Uniswap v3</text><text class="s" x="1059" y="640">USDT to WBT</text>
+</svg>
+</body>
+</html>
