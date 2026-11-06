@@ -36,7 +36,7 @@ Record three iOS Simulators side by side on the real testnet, plus one short rea
 
 Restart the simulators just before you start. After an hour booted, one read as offline while the Mac was online.
 
-1. Run `bun run lab --ios --testnet`. It opens one wallet per simulator at ports 5191 to 5193, and funds the customer and the merchant from the relayer account the first time each wallet opens.
+1. Run `bun run lab --ios --testnet`. It opens one wallet per simulator at ports 5191 to 5193. A Safari tab gets no funds. The relayer account funds the customer and the merchant the first time each opens from the Home Screen.
 2. Start a local relayer in a visible terminal with `bun apps/relayer/src/index.ts`. Press Ctrl-C at 2:00 to switch the backend off on camera.
 3. On each simulator, use **Add to Home Screen** and open the wallet from there. In Safari the verdict stops short of the screen edges, and the browser bar stays in the shot.
 4. Load money, then tap **Refresh** on all three while online.

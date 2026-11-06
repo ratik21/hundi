@@ -31,6 +31,15 @@ export const takeLabQr = async (): Promise<Bytes | null> => {
   return hex ? (hexToBytes(hex) as Bytes) : null;
 };
 
+/** A home-screen app has its own storage, so it is a different wallet from the Safari tab. */
+const installed = () =>
+  matchMedia("(display-mode: standalone)").matches ||
+  (navigator as { standalone?: boolean }).standalone === true;
+
 export const fundLabWallet = async (address: string) => {
-  await post("/fund", { address, from: location.origin });
+  await post("/fund", {
+    address,
+    from: location.origin,
+    installed: installed(),
+  });
 };

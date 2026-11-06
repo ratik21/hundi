@@ -82,8 +82,12 @@ const fundedBefore = async () => {
   return (await funds.exists()) ? (await funds.text()).split("\n") : [];
 };
 
-const fund = async (address: Address, from: string) => {
+const fund = async (address: Address, from: string, installed: boolean) => {
   if (process.env.LAB_TESTNET) {
+    // Real funds go only to the home-screen wallet, the one the video films.
+    if (!installed) {
+      return;
+    }
     const seen = await fundedBefore();
     if (!seen.includes(address)) {
       await write(FUNDED_FILE, [...seen, address].join("\n"));
@@ -104,11 +108,12 @@ serve({
       return new Response(null, { headers: CORS, status: 204 });
     }
     if (url.pathname === "/fund") {
-      const { address, from } = (await request.json()) as {
+      const { address, from, installed } = (await request.json()) as {
         address: Address;
         from: string;
+        installed: boolean;
       };
-      await fund(address, from);
+      await fund(address, from, installed);
       return Response.json({}, { headers: CORS });
     }
     if (request.method === "POST") {
