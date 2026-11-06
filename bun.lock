@@ -48,6 +48,17 @@
         "zod": "4.6.7",
       },
     },
+    "apps/shop": {
+      "name": "@hundi/shop",
+      "version": "0.1.0",
+      "dependencies": {
+        "@hundi/core": "workspace:*",
+        "@hundi/wallet": "workspace:*",
+      },
+      "devDependencies": {
+        "vite": "8.3.6",
+      },
+    },
     "packages/core": {
       "name": "@hundi/core",
       "version": "0.1.0",
@@ -292,6 +303,8 @@
     "@hundi/pwa": ["@hundi/pwa@workspace:apps/pwa"],
 
     "@hundi/relayer": ["@hundi/relayer@workspace:apps/relayer"],
+
+    "@hundi/shop": ["@hundi/shop@workspace:apps/shop"],
 
     "@hundi/wallet": ["@hundi/wallet@workspace:packages/wallet"],
 

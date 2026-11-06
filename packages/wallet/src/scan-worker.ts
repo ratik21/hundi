@@ -1,4 +1,4 @@
-import { type QrImage, readQr } from "@hundi/wallet/qr";
+import { type QrImage, readQr } from "./qr";
 
 addEventListener("message", (event: MessageEvent<QrImage>) => {
   postMessage(readQr(event.data));

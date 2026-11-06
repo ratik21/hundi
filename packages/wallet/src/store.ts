@@ -24,8 +24,19 @@ export interface Settings {
   submitDirectly: boolean;
 }
 
+export interface Receipt {
+  /** Unix seconds when this device saw the payment land. */
+  at: bigint;
+  kind: "covered" | "paid";
+  noteId: NoteId;
+  /** What arrived, after any relay fee. */
+  paid: bigint;
+  txHash: Hex;
+}
+
 export interface Meta {
   fundingKey: Hex;
+  receipts: readonly Receipt[];
   settings: Settings;
   snapshot: Snapshot;
   syncedBlock: bigint;

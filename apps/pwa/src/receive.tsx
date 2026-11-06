@@ -1,25 +1,9 @@
 import { decodePayment, encodeRequest } from "@hundi/core/bytes";
-import type {
-  PayRequest,
-  RejectReason,
-  UsdtAtoms,
-  Verdict,
-} from "@hundi/core/types";
+import type { PayRequest, UsdtAtoms, Verdict } from "@hundi/core/types";
+import { REJECT_MESSAGES } from "@hundi/wallet/messages";
 import { formatUsdt, usdt, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useMemo, useState } from "react";
 import { Button, Camera, Notice, QrCode, Screen, Stepper } from "./ui";
-
-const REASONS: Record<RejectReason, string> = {
-  bad_chain: "This note's history is broken.",
-  bad_signature: "This note is not signed correctly.",
-  expiring: "This note is about to expire.",
-  seen_before: "You have already taken this note.",
-  spent: "This note has already been cashed.",
-  too_long: "This note has changed hands too often. Ask them to settle it.",
-  uncovered: "Nobody's safety deposit covers this note.",
-  unknown_note: "This note is newer than your last check. Go online once.",
-  wrong_amount: "The amount does not match.",
-};
 
 const DEFAULT_USDT = 5;
 
@@ -41,7 +25,7 @@ const VerdictScreen = ({
     <p className="tabular text-2xl">
       {verdict.ok
         ? `${formatUsdt(verdict.amount)} USDT`
-        : REASONS[verdict.reason]}
+        : REJECT_MESSAGES[verdict.reason]}
     </p>
     {verdict.ok && <p className="opacity-80">Checked with no network</p>}
     <div className="mt-8 w-full max-w-xs">

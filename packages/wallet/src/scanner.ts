@@ -1,5 +1,5 @@
-import type { Bytes } from "@hundi/wallet/keystore";
-import type { QrImage } from "@hundi/wallet/qr";
+import type { Bytes } from "./keystore";
+import type { QrImage } from "./qr";
 
 export interface Decoder {
   decode: (image: QrImage) => Promise<Bytes | null>;

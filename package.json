@@ -8,7 +8,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "bun run --filter '@hundi/pwa' build",
+    "build": "bun run --filter '@hundi/pwa' build && bun run --filter '@hundi/shop' build",
     "check": "ultracite check",
     "fix": "ultracite fix",
     "relayer": "scripts/relayer-up.sh",

@@ -1,0 +1,10 @@
+{
+  "headers": [
+    {
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ],
+      "source": "/(hundi-sw.js|index.html)"
+    }
+  ]
+}

@@ -12,10 +12,13 @@ import {
   BaseError,
   type ContractFunctionArgs,
   ContractFunctionRevertedError,
+  createPublicClient,
   createWalletClient,
   defineChain,
   encodeAbiParameters,
+  fallback,
   type Hex,
+  http,
   keccak256,
   type PublicClient,
   parseAbiParameters,
@@ -39,6 +42,31 @@ export const GRACE = BigInt(deployment.grace);
 export const CHAIN_ID = BigInt(deployment.chainId);
 
 /** The Whitechain RPC refuses `eth_getLogs` over 10,000 blocks. */
+const DEFAULT_RPC = "https://rpc.testnet.whitechain.io/";
+const BACKUP_RPC = "https://rpc.ankr.com/whitechain_testnet";
+
+export const createReads = (rpc?: string): PublicClient =>
+  createPublicClient({
+    chain: whitechainSepolia,
+    pollingInterval: 1000,
+    transport: rpc
+      ? http(rpc)
+      : fallback([http(DEFAULT_RPC), http(BACKUP_RPC)]),
+  }) as PublicClient;
+
+export const createWrites = (rpc?: string): Transport =>
+  http(rpc ?? DEFAULT_RPC);
+
+/** A lookup, read at submit time, so a restarted tunnel needs no new build. */
+export const relayerFrom = (file: string) => async () => {
+  const response = await fetch(file, { cache: "no-store" });
+  const url = response.ok ? (await response.text()).trim() : "";
+  return url.startsWith("https://") ? url : undefined;
+};
+
+export const receiptUrl = (txHash: string): string =>
+  `https://explorer.testnet.whitechain.io/tx/${txHash}`;
+
 const LOG_CHUNK = 9000n;
 
 export const whitechainSepolia = defineChain({

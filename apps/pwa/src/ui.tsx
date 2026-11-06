@@ -1,6 +1,6 @@
 import { drawQr } from "@hundi/wallet/qr";
+import { startScan } from "@hundi/wallet/scanner";
 import { type ReactNode, useEffect, useLayoutEffect, useRef } from "react";
-import { startScan } from "./scanner";
 
 export const Screen = ({
   children,

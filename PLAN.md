@@ -256,17 +256,17 @@ This is what the Whitechain Operate track asks for.
 
 **Files.**
 
-- [ ] Create `packages/wallet/src/widget.ts` exporting `mountHundi` and `registerHundiWorker`.
-- [ ] Create `apps/shop/`, a separate small chai shop app.
+- [x] Create `packages/wallet/src/widget.ts` exporting `mountHundi` and `registerHundiWorker`.
+- [x] Create `apps/shop/`, a separate small chai shop app.
 
 **Build.**
 
-- [ ] Integrate the widget in `apps/shop` in about 20 lines. Show the merchant view and the customer view.
-- [ ] Add a settlement CSV export for the accountant, which Operate gives extra credit for.
+- [x] Integrate the widget in `apps/shop` in about 20 lines. Show the merchant view and the customer view.
+- [x] Add a settlement CSV export for the accountant, which Operate gives extra credit for.
 
 **You see.**
 
-- [ ] `apps/shop` takes a payment offline. Evidence is a screenshot, plus the line count of the integration.
+- [x] `apps/shop` takes a payment offline. Evidence is `docs/ai/evidence/shop-paid-offline.png`, plus the line count of the integration, 21 lines in `apps/shop/src/main.ts`. Tested in Chrome with a stubbed camera on a local fork. Not yet tested on a phone.
 
 ## Route reads through Anon-RPC (U8)
 

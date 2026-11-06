@@ -1,3 +1,4 @@
+import { receiptUrl } from "@hundi/wallet/chain-io";
 import type { NoteRecord } from "@hundi/wallet/store";
 import {
   formatUsdt,
@@ -6,7 +7,6 @@ import {
 } from "@hundi/wallet/wallet";
 import { useCallback, useState } from "react";
 import type { Route } from "./app";
-import { receiptUrl } from "./network";
 import { Button, Card, Notice } from "./ui";
 import type { WalletView } from "./use-wallet";
 

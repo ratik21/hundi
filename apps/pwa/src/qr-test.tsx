@@ -5,6 +5,7 @@ import {
   openDeviceKey,
 } from "@hundi/wallet/keystore";
 import { drawQr, renderQr } from "@hundi/wallet/qr";
+import { createDecoder, type Scan, startScan } from "@hundi/wallet/scanner";
 import {
   useCallback,
   useEffect,
@@ -19,7 +20,6 @@ import {
   payloadVerifies,
   TWO_HOP_BYTES,
 } from "./payload";
-import { createDecoder, type Scan, startScan } from "./scanner";
 
 /** PLAN.md U3 requires a scan within 5 seconds. */
 const SCAN_LIMIT_MS = 5000;

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+      name="viewport"
+    >
+    <meta content="#7a3b12" name="theme-color">
+    <title>Corner Chai</title>
+    <style>
+    body {
+      margin: 0;
+      font-family: Georgia, serif;
+      color: #2d1a0b;
+      background: #fbf3e4;
+    }
+    main {
+      max-width: 26rem;
+      padding: 1.25rem;
+      margin: auto;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    nav {
+      display: flex;
+      gap: 1rem;
+      margin: 0.5rem 0 1rem;
+      font-size: 0.95rem;
+    }
+    nav a {
+      color: #7a3b12;
+    }
+    .item {
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      background: #fff;
+      border-radius: 12px;
+    }
+    #orders {
+      padding-left: 1.25rem;
+    }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Corner Chai</h1>
+      <nav>
+        <a href="#merchant">Till</a>
+        <a href="#customer">Customer</a>
+      </nav>
+      <div class="item">Cutting chai and samosa, 5.00 USDT</div>
+      <div id="till"></div>
+      <h2>Paid orders</h2>
+      <ol id="orders"></ol>
+    </main>
+    <script src="/src/main.ts" type="module"></script>
+  </body>
+</html>

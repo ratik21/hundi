@@ -64,6 +64,7 @@ import {
   indexedDbStore,
   type NoteRecord,
   offered,
+  type Receipt,
   type Settings,
   type WalletStore,
 } from "./store";
@@ -424,12 +425,11 @@ export const openWallet = async (options: WalletOptions) => {
       txHash: txHash as Hex32,
     });
     const received = paid > fee ? paid - fee : 0n;
-    return {
-      kind: honest ? "paid" : "covered",
-      noteId: id,
-      paid: received,
-      txHash,
-    };
+    const kind = honest ? "paid" : "covered";
+    const receipt = { kind, noteId: id, paid: received, txHash } as const;
+    const earlier = (await store.read("receipts")) ?? [];
+    await store.write("receipts", [...earlier, { ...receipt, at: now() }]);
+    return receipt;
   };
 
   /** Redeems every note this device received. Safe to run as often as you like. */
@@ -479,6 +479,9 @@ export const openWallet = async (options: WalletOptions) => {
       functionName: "balanceOf",
     });
 
+  const receipts = async (): Promise<readonly Receipt[]> =>
+    (await store.read("receipts")) ?? [];
+
   return {
     address: funding.address,
     deposit,
@@ -488,6 +491,7 @@ export const openWallet = async (options: WalletOptions) => {
     notes: () => store.notes(),
     pay,
     payout,
+    receipts,
     receive,
     request,
     settings,

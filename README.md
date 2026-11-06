@@ -14,6 +14,21 @@ Everything runs on the Whitechain Sepolia testnet, chain 1874.
 - Settled directly with the relayer stopped: [0xaee9...bca8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8)
 - Wallet: <https://hundi-ten.vercel.app>
 
+## Drop-in widget
+
+`apps/shop` is a separate chai shop with no framework. It takes Hundi in the 21 lines of `apps/shop/src/main.ts`.
+
+```ts
+await registerHundiWorker();
+await mountHundi(document.querySelector("#till"), {
+  onVerdict: markOrderPaid,
+  price: "5.00",
+  role: location.hash === "#customer" ? "customer" : "merchant",
+});
+```
+
+The till has a merchant view and a customer view, works in airplane mode after one online load, and exports a settlement CSV for the accountant. The host page must serve `packages/wallet/hundi-sw.js` from its root. `price` must equal a note's face value, because a payment carries one note and gives no change.
+
 ## Relayer
 
 The relayer is optional. It carries `load` and `settle` for a device with no gas, and takes a 0.10 USDT fee from the payout. It simulates every call first, and refuses anything that would fail or would not cover its gas. Any device can skip it with **Submit directly**.

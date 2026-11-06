@@ -2,6 +2,13 @@
   "headers": [
     {
       "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ],
+      "source": "/relayer.txt"
+    },
+    {
+      "headers": [
         { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
       ],
       "source": "/(sw.js|registerSW.js|index.html|manifest.webmanifest)"
