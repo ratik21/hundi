@@ -12,6 +12,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.4
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.9.0
       - run: bun install --frozen-lockfile
       - run: bunx ultracite check
       - run: bun run typecheck

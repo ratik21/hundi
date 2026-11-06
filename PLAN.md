@@ -176,29 +176,29 @@ If 618 bytes fails to scan, lower `MAX_HOPS` to 2, which gives 362 bytes. The de
 
 **Files.**
 
-- [ ] Create `packages/core/src/chain.ts` with `walk` and `appendHop`.
-- [ ] Create `packages/core/src/rule.ts` with the pure `accept` function from Appendix B.
-- [ ] Create `packages/core/src/snapshot.ts` with a pure reducer over contract events.
-- [ ] Create `packages/wallet/src/store.ts` with the note state machine in IndexedDB.
-- [ ] Create `packages/wallet/src/chain-io.ts` for reads, simulation and submission.
-- [ ] Create `packages/wallet/src/wallet.ts` as the only public entry point.
+- [x] Create `packages/core/src/chain.ts` with `walk` and `appendHop`.
+- [x] Create `packages/core/src/rule.ts` with the pure `accept` function from Appendix B.
+- [x] Create `packages/core/src/snapshot.ts` with a pure reducer over contract events.
+- [x] Create `packages/wallet/src/store.ts` with the note state machine in IndexedDB.
+- [x] Create `packages/wallet/src/chain-io.ts` for reads, simulation and submission.
+- [x] Create `packages/wallet/src/wallet.ts` as the only public entry point.
 
 **Build.**
 
-- [ ] Implement `load`, `sync`, `request`, `pay`, `receive` and `settle`.
-- [ ] Mark a note `offered` before showing its QR. An offered note can only re-show the same hop.
-- [ ] Make `settle` idempotent. It reads the chain first, and reports `already` for finished work.
+- [x] Implement `load`, `sync`, `request`, `pay`, `receive` and `settle`.
+- [x] Mark a note `offered` before showing its QR. An offered note can only re-show the same hop.
+- [x] Make `settle` idempotent. It reads the chain first, and reports `already` for finished work.
 - [ ] Test `eth_getLogs` through Anon-RPC now, before building on it. Evidence is a saved log. If it fails, follow the fallback in U8.
-- [ ] Generate a secp256k1 funding key in the app for EIP-3009 and as the default payout address. Sign the USDT authorization with `USDT_DOMAIN`.
+- [x] Generate a secp256k1 funding key in the app for EIP-3009 and as the default payout address. Sign the USDT authorization with `USDT_DOMAIN`.
 
 **Verify.**
 
-- [ ] `packages/core/src/rule.test.ts` covers every rejection reason in Appendix B.
-- [ ] `packages/wallet/src/story.test.ts` runs the whole demo against a local fork. Run `~/.local/bin/mb-heavy bun test packages/wallet/src/story.test.ts`.
+- [x] `packages/core/src/rule.test.ts` covers every rejection reason in Appendix B.
+- [x] `packages/wallet/src/story.test.ts` runs the whole demo against a local fork. Run `~/.local/bin/mb-heavy bun test packages/wallet/src/story.test.ts`.
 
 **You see.**
 
-- [ ] The story test ends with the honest note settled, the forked note settled, and the victim paid from the bond.
+- [x] The story test ends with the honest note settled, the forked note settled, and the victim paid from the bond.
 
 ## Build the app (U5)
 

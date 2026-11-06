@@ -287,3 +287,4 @@ const transport = http(rpcUrl, { fetchFn: (input, init) => worker.fetch(input, i
 - ethglobal.com rate-limits fast crawls with HTTP 429. Keep a 2 second gap between requests.
 - Ultracite's `useSortedKeys` reorders object literals on fix. Never call a stateful reader or any order-dependent function inside an object literal. Read into locals first.
 - Forge's local EVM has no `0x100` P-256 precompile before `osaka`, so a fork test on `prague` sees empty return data for every signature. Tests run on `osaka`. Deploy with `FOUNDRY_PROFILE=deploy`, which keeps `prague`.
+- The Whitechain RPC refuses `eth_getLogs` over 10,000 blocks. At one block per second that is under 3 hours, so always read logs in chunks.

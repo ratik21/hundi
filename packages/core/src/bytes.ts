@@ -113,6 +113,9 @@ export const withdrawMessage = (
 /** The identity of a signed message, and the digest the precompile checks. */
 export const linkOf = (message: Uint8Array): Link => hash<Link>(message);
 
+/** A note id or a link, used as the place the next message is signed. */
+export const slotOf = (value: Hex32): Slot => value as Hex as Slot;
+
 export const domainTag = (dom: Domain): Bytes8 =>
   toHex<Bytes8>(fixed(dom, 32).slice(0, 8));
 

@@ -54,4 +54,44 @@ export interface Payment {
   requestId: Bytes8;
 }
 
+export interface Bond {
+  amount: UsdtAtoms;
+  lockedUntil: UnixSeconds;
+}
+
+export interface NoteFacts {
+  expiry: UnixSeconds;
+  face: UsdtAtoms;
+  settled: boolean;
+}
+
+export interface Snapshot {
+  bonds: ReadonlyMap<KeyId, Bond>;
+  notes: ReadonlyMap<NoteId, NoteFacts>;
+  syncedAt: UnixSeconds;
+}
+
+export type NoteState =
+  | { kind: "held"; note: Note }
+  | { kind: "offered"; hop: Hop; note: Note; requestId: Bytes8 }
+  | { kind: "settled"; txHash: Hex32 }
+  | { kind: "lost"; txHash: Hex32 };
+
+export type RejectReason =
+  | "wrong_amount"
+  | "too_long"
+  | "unknown_note"
+  | "spent"
+  | "expiring"
+  | "seen_before"
+  | "bad_signature"
+  | "bad_chain"
+  | "uncovered";
+
+export type Verdict =
+  | { ok: true; amount: UsdtAtoms }
+  | { ok: false; reason: RejectReason };
+
 export const MAX_HOPS = 4;
+/** Seconds of clock drift a receiver allows for. */
+export const MARGIN = 300n;
