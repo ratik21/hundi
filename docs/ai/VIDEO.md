@@ -19,7 +19,7 @@ The video must run 2:30 to 2:55. Whitechain wants 2 to 4 minutes that show each 
 | --- | --- | --- |
 | 0:00 | Title card | "Access Now counted 65 internet shutdowns in India last year. When the network goes, digital money stops. Merchants here solved this centuries ago with the hundi, a paper note that passed from hand to hand." |
 | 0:15 | Three wallets side by side. Name each party | "A customer, a stall, and the stall's supplier. Everyone synced earlier, and the customer locked up two 5 USDT notes and a safety deposit." |
-| 0:25 | Turn on airplane mode on the iPhone | "From here on there is no network." |
+| 0:25 | Turn off the Wi-Fi | "From here on there is no network." |
 | 0:35 | Stall shows a code. Customer scans it and pays. Stall scans. Big green Paid | "The customer pays. The stall checks it on the spot, with no network. No gas, no seed phrase, no chain to pick." |
 | 0:55 | Stall pays the supplier with the same note. Paid | "Now the part nobody else does. The stall spends that same money onward, still offline. The money moved twice with no network." |
 | 1:15 | Customer turns off the guard, then pays note 2 to both the stall and the supplier. Two green screens | "Now I cheat. Same note, two people. Both look valid, because offline nobody can know yet." |
@@ -31,10 +31,15 @@ The video must run 2:30 to 2:55. Whitechain wants 2 to 4 minutes that show each 
 
 ## How to record
 
-1. Record on the laptop, with QuickTime or OBS. Mirror the iPhone over a cable with QuickTime, under **New Movie Recording**. Don't use iPhone Mirroring, because it may not give you the camera.
-2. Use three real devices: the iPhone, the laptop, and a friend's phone as the supplier. Their wallet needs no money.
-3. Before each take, sync all three devices while online.
-4. Record the voice separately if that is easier, then lay it over the footage.
-5. Cut the waiting. Never speed the footage up.
+Record three iOS Simulators side by side on the real testnet, plus one short real clip. Decided by Ratik on 6 Nov.
 
-A take uses up both notes and 10 USDT of the deposit, so ask for a top-up before a retake.
+1. Run `bun run lab --ios --testnet`. It opens one wallet per simulator at ports 5191 to 5193, and funds the customer and the stall from the relayer account the first time each wallet opens.
+2. Start a local relayer in a visible terminal with `bun apps/relayer/src/index.ts`. Press Ctrl-C at 2:00 to switch the backend off on camera.
+3. Load money, then tap **Refresh** on all three while online.
+4. For the offline half, turn off the Mac's Wi-Fi. The simulators lose the chain, and QR codes still pass over `localhost`. This is untested, so try it before the take.
+5. Record the laptop screen with QuickTime or OBS. Don't record on a phone.
+6. Add a real clip of the iPhone in airplane mode scanning a code from the laptop. A simulator has no camera, so this clip shows the scan is real.
+7. Say it plainly in the video and in the README: the simulators pass QR codes through a local relay because they have no camera.
+8. Record the voice separately if that is easier. Cut the waiting. Never speed the footage up.
+
+A take uses up both notes and 10 USDT of the deposit. A retake needs new wallets or a top-up, and the relayer account holds enough for about one full take, so plan for the faucet.
