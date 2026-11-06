@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>How Hundi works</title>
+<style>
+  :root { --base:#0d1014; --surface:#171b22; --line:#2c3340; --fg:#f3f5f8; --muted:#9aa3b2; --accent:#f5b83d; --good:#3ddc97; --bad:#ff6b5e; }
+  * { box-sizing:border-box; margin:0; }
+  html,body { background:var(--base); }
+  body { width:1600px; color:var(--fg); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif; }
+  .panel { padding:44px 64px 52px; }
+  section { display:grid; grid-template-columns:170px 1fr; align-items:center; gap:28px; padding:34px 0; }
+  section + section { border-top:1px solid var(--line); }
+  h2 { font-size:30px; line-height:1.15; font-weight:700; }
+  h2 small { display:block; color:var(--muted); font-size:16px; font-weight:500; margin-top:8px; line-height:1.3; }
+  .flow { display:flex; align-items:center; }
+  .pair { display:flex; justify-content:center; }
+  .pair .dot { margin:0 0 12px; }
+  .pair .dot + .dot { margin-left:-22px; }
+  .who { width:124px; flex:none; text-align:center; }
+  .dot { width:84px; height:84px; margin:0 auto 12px; border-radius:50%; display:grid; place-items:center; font-size:34px; font-weight:700; background:var(--surface); border:2px solid var(--line); }
+  .who.wide { width:190px; }
+  .who b { display:block; font-size:21px; font-weight:600; }
+  .who span { display:block; color:var(--muted); font-size:16px; margin-top:2px; }
+  .chain .dot { background:var(--accent); border-color:var(--accent); color:#1a1405; font-size:38px; }
+  .cheat .dot { border-color:var(--bad); color:var(--bad); }
+  .link { flex:1; min-width:120px; height:92px; position:relative; text-align:center; padding:0 10px; }
+  .link p { font-size:20px; font-weight:600; min-height:27px; }
+  .link em { display:block; font-style:normal; color:var(--muted); font-size:16px; position:absolute; inset-inline:0; top:50px; }
+  .arrow { position:absolute; left:6px; right:6px; top:38px; height:3px; background:var(--accent); border-radius:2px; }
+  .arrow::after { content:""; position:absolute; right:-1px; top:-7px; border-left:15px solid var(--accent); border-top:8.5px solid transparent; border-bottom:8.5px solid transparent; }
+  .off .arrow { background:repeating-linear-gradient(90deg,var(--line) 0 12px,transparent 12px 22px); }
+  .off .arrow::after { display:none; }
+  .off p { color:var(--bad); }
+  .off .arrow { top:64px; }
+  .x { position:absolute; left:50%; top:65px; transform:translate(-50%,-50%); width:46px; height:46px; border-radius:50%; background:var(--base); border:2px solid var(--bad); color:var(--bad); display:grid; place-items:center; font-size:26px; font-weight:700; }
+  .result { width:300px; flex:none; margin-left:30px; padding:16px 20px; border-radius:14px; font-size:20px; font-weight:600; line-height:1.35; background:var(--surface); border:1px solid var(--line); }
+  .result small { display:block; color:var(--muted); font-size:16px; font-weight:400; margin-top:6px; }
+  .result.bad { color:var(--bad); }
+  .result.good { color:var(--good); }
+  .result.good small, .result.bad small { color:var(--muted); }
+  .fork { flex:1; display:grid; gap:18px; }
+  .fork .flow { min-height:112px; }
+  .cheatrow { display:flex; align-items:center; flex:1; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <section>
+    <h2>Without Hundi</h2>
+    <div class="flow">
+      <div class="who"><div class="dot">A</div><b>Alice</b><span>customer</span></div>
+      <div class="link off"><p>Network down</p><div class="arrow"></div><div class="x">✕</div></div>
+      <div class="who"><div class="dot">B</div><b>Bob</b><span>merchant</span></div>
+      <div class="result bad">The payment fails<small>Digital money stops when the network does.</small></div>
+    </div>
+  </section>
+  <section>
+    <h2>With Hundi</h2>
+    <div class="flow">
+      <div class="who"><div class="dot">A</div><b>Alice</b><span>customer</span></div>
+      <div class="link"><p>Pays by QR</p><div class="arrow"></div><em>no network</em></div>
+      <div class="who"><div class="dot">B</div><b>Bob</b><span>merchant</span></div>
+      <div class="link"><p>Spends it on</p><div class="arrow"></div><em>still no network</em></div>
+      <div class="who"><div class="dot">C</div><b>Carol</b><span>supplier</span></div>
+      <div class="link"><p>Claims</p><div class="arrow"></div><em>once online</em></div>
+      <div class="who chain"><div class="dot">₮</div><b>USDT</b><span>on-chain</span></div>
+    </div>
+  </section>
+  <section>
+    <h2>If someone cheats</h2>
+    <div class="flow">
+      <div class="who cheat"><div class="dot">M</div><b>Mallory</b><span>cheater</span></div>
+      <div class="link"><p>Pays Bob and Carol</p><div class="arrow"></div><em>the same money, twice</em></div>
+      <div class="who wide"><div class="pair"><div class="dot">B</div><div class="dot">C</div></div><b>Bob and Carol</b><span>both see a valid payment</span></div>
+      <div class="link"><p>Both claim</p><div class="arrow"></div><em>once online</em></div>
+      <div class="who chain"><div class="dot">₮</div><b>USDT</b><span>on-chain</span></div>
+      <div class="result good">Two signatures prove it<small>Bob and Carol get paid. Mallory's deposit loses double.</small></div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
