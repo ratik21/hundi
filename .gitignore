@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+node_modules/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+dist/
+dev-dist/
+.vercel/
+*.tsbuildinfo
+*.pem
+.DS_Store
+HANDOFF.md
+.handoffs/
