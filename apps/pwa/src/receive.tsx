@@ -1,40 +1,30 @@
 import { decodePayment, encodeRequest } from "@hundi/core/bytes";
-import type { PayRequest, UsdtAtoms, Verdict } from "@hundi/core/types";
+import type {
+  Verdict as Outcome,
+  PayRequest,
+  RejectReason,
+  UsdtAtoms,
+} from "@hundi/core/types";
 import { REJECT_MESSAGES } from "@hundi/wallet/messages";
 import { formatUsdt, usdt, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useMemo, useState } from "react";
-import { Button, Camera, Notice, QrCode, Screen, Stepper } from "./ui";
+import { Verdict } from "./moments";
+import { Button, Camera, Notice, QrCode, Screen } from "./ui";
 
-const DEFAULT_USDT = 5;
+const NOTE_USDT = 5;
+const ASK_ANOTHER = "Do not hand over the goods. Ask for another note.";
 
-const VerdictScreen = ({
-  onDone,
-  verdict,
-}: {
-  onDone: () => void;
-  verdict: Verdict;
-}) => (
-  <main
-    className={`flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center text-white ${
-      verdict.ok ? "bg-leaf" : "bg-clay"
-    }`}
-    data-verdict={verdict.ok ? "ok" : verdict.reason}
-  >
-    <p className="text-8xl">{verdict.ok ? "✓" : "✕"}</p>
-    <p className="text-5xl font-bold">{verdict.ok ? "Paid" : "Refused"}</p>
-    <p className="tabular text-2xl">
-      {verdict.ok
-        ? `${formatUsdt(verdict.amount)} USDT`
-        : REJECT_MESSAGES[verdict.reason]}
-    </p>
-    {verdict.ok && <p className="opacity-80">Checked with no network</p>}
-    <div className="mt-8 w-full max-w-xs">
-      <Button onClick={onDone} variant="plain">
-        Done
-      </Button>
-    </div>
-  </main>
-);
+const NEXT_STEPS: Record<RejectReason, string> = {
+  bad_chain: ASK_ANOTHER,
+  bad_signature: ASK_ANOTHER,
+  expiring: ASK_ANOTHER,
+  seen_before: "Do not hand over the goods. This one is not new money.",
+  spent: ASK_ANOTHER,
+  too_long: ASK_ANOTHER,
+  uncovered: ASK_ANOTHER,
+  unknown_note: "Get signal, tap Refresh on the home screen, and scan again.",
+  wrong_amount: "Start again so you both see the same amount.",
+};
 
 export const Receive = ({
   onDone,
@@ -43,27 +33,22 @@ export const Receive = ({
   onDone: () => void;
   wallet: Wallet;
 }) => {
-  const [amount, setAmount] = useState(DEFAULT_USDT);
-  const [request, setRequest] = useState<PayRequest | null>(null);
+  const [request] = useState<PayRequest>(() =>
+    wallet.request(usdt(NOTE_USDT) as UsdtAtoms)
+  );
   const [scanning, setScanning] = useState(false);
-  const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [problem, setProblem] = useState("");
   const [attempt, setAttempt] = useState(0);
 
-  const code = useMemo(() => request && encodeRequest(request), [request]);
-
-  const ask = useCallback(() => {
-    setRequest(wallet.request(usdt(amount) as UsdtAtoms));
-  }, [amount, wallet]);
+  const code = useMemo(() => encodeRequest(request), [request]);
+  const amount = `${formatUsdt(request.amount)} USDT`;
 
   const scanned = useCallback(
     async (bytes: Uint8Array) => {
-      if (!request) {
-        return;
-      }
       try {
         setProblem("");
-        setVerdict(await wallet.receive(decodePayment(bytes), request));
+        setOutcome(await wallet.receive(decodePayment(bytes), request));
       } catch {
         setProblem("That is not a payment. Scan their Pay screen.");
         setAttempt((current) => current + 1);
@@ -72,8 +57,31 @@ export const Receive = ({
     [request, wallet]
   );
 
-  if (verdict) {
-    return <VerdictScreen onDone={onDone} verdict={verdict} />;
+  if (outcome?.ok) {
+    return (
+      <Verdict
+        amount={`${formatUsdt(outcome.amount)} USDT`}
+        line="Checked with no network"
+        onDone={onDone}
+        tone="ok"
+        verdict="ok"
+        word="Paid"
+      />
+    );
+  }
+
+  if (outcome) {
+    return (
+      <Verdict
+        amount={amount}
+        line={REJECT_MESSAGES[outcome.reason]}
+        next={NEXT_STEPS[outcome.reason]}
+        onDone={onDone}
+        tone="bad"
+        verdict={outcome.reason}
+        word="Refused"
+      />
+    );
   }
 
   if (scanning) {
@@ -81,39 +89,25 @@ export const Receive = ({
       <Screen onBack={() => setScanning(false)} title="Scan their payment">
         <Camera key={attempt} onBytes={scanned} onError={setProblem} />
         {problem && <Notice tone="bad">{problem}</Notice>}
-      </Screen>
-    );
-  }
-
-  if (code && request) {
-    return (
-      <Screen onBack={onDone} title="Ask them to scan this">
-        <QrCode bytes={code} />
-        <p className="tabular text-center text-4xl font-bold">
-          {formatUsdt(request.amount)} USDT
+        <p className="text-center text-lg">
+          Point at the code on their phone. It checks with no signal.
         </p>
-        <div className="mt-auto">
-          <Button onClick={() => setScanning(true)}>Scan their payment</Button>
-        </div>
       </Screen>
     );
   }
 
   return (
-    <Screen onBack={onDone} title="Receive">
-      <section className="py-8">
-        <Stepper
-          label="Amount"
-          onChange={setAmount}
-          step={DEFAULT_USDT}
-          suffix="USDT"
-          value={amount}
-        />
-      </section>
+    <Screen onBack={onDone} title="Ask them to scan">
+      <QrCode bytes={code} />
+      <p className="tabular text-center font-serif text-4xl font-semibold">
+        {amount}
+      </p>
+      <p className="text-muted text-center">
+        One payment is one note. Once they have paid, scan the code on their
+        phone.
+      </p>
       <div className="mt-auto">
-        <Button disabled={amount === 0} onClick={ask}>
-          Ask for {amount} USDT
-        </Button>
+        <Button onClick={() => setScanning(true)}>Scan their payment</Button>
       </div>
     </Screen>
   );

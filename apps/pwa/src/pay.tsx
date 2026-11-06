@@ -2,7 +2,8 @@ import { decodeRequest, encodePayment } from "@hundi/core/bytes";
 import type { PayRequest } from "@hundi/core/types";
 import { formatUsdt, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useState } from "react";
-import { Button, Camera, Notice, QrCode, Screen } from "./ui";
+import { Failure } from "./moments";
+import { Button, Camera, Note, Notice, QrCode, Screen } from "./ui";
 
 type Step =
   | { kind: "scan" }
@@ -10,12 +11,24 @@ type Step =
   | { kind: "failed"; message: string }
   | { amount: bigint; bytes: Uint8Array; kind: "show" };
 
+const NO_NOTE = "No note can pay this amount";
+
+const NEXT_STEPS: Record<string, string> = {
+  [NO_NOTE]:
+    "You have no notes left to spend. Add money when you have signal, or receive a payment first.",
+  "This request is for another network":
+    "Ask them to open Receive in Hundi on their phone, then scan again.",
+};
+
 export const Pay = ({
   guard,
+  onAddMoney,
   onDone,
   wallet,
 }: {
   guard: boolean;
+  /** Absent with no signal, when adding money is not an option. */
+  onAddMoney?: (() => void) | undefined;
   onDone: () => void;
   wallet: Wallet;
 }) => {
@@ -55,12 +68,17 @@ export const Pay = ({
 
   if (step.kind === "failed") {
     return (
-      <Screen onBack={onDone} title="Not paid">
-        <Notice tone="bad">{step.message}</Notice>
-        <div className="mt-auto">
-          <Button onClick={onDone}>Done</Button>
-        </div>
-      </Screen>
+      <Failure
+        action={
+          onAddMoney && step.message === NO_NOTE
+            ? { label: "Add money", onClick: onAddMoney }
+            : undefined
+        }
+        next={NEXT_STEPS[step.message] ?? "Go back and try again."}
+        onDone={onDone}
+        title="Not paid"
+        what={`${step.message}. Nothing left your phone.`}
+      />
     );
   }
 
@@ -68,11 +86,11 @@ export const Pay = ({
     return (
       <Screen onBack={onDone} title="Show this to them">
         <QrCode bytes={step.bytes} />
-        <p className="tabular text-center text-4xl font-bold">
+        <p className="tabular text-center font-serif text-4xl font-semibold">
           {formatUsdt(step.amount)} USDT
         </p>
         <p className="text-muted text-center">
-          They scan this. Turn your brightness up.
+          They scan this to get paid. Turn your brightness up.
         </p>
         <div className="mt-auto">
           <Button onClick={onDone}>Done</Button>
@@ -85,12 +103,19 @@ export const Pay = ({
     const { amount } = step.request;
     return (
       <Screen onBack={onDone} title="Pay">
-        <section className="py-10 text-center">
-          <p className="text-muted">You are paying</p>
-          <p className="tabular text-6xl font-bold">
-            {amount === 0n ? "One note" : `${formatUsdt(amount)} USDT`}
-          </p>
-        </section>
+        <div className="animate-lift mt-6">
+          <Note>
+            <div className="py-6 text-center">
+              <p className="text-muted">You are paying</p>
+              <p className="tabular mt-1 font-serif text-6xl font-semibold">
+                {amount === 0n ? "One note" : `${formatUsdt(amount)} USDT`}
+              </p>
+            </div>
+          </Note>
+        </div>
+        <p className="text-muted text-center">
+          One whole note leaves your phone. It works with no signal.
+        </p>
         {!guard && <Notice tone="warn">Demo: double-spend guard is off</Notice>}
         <div className="mt-auto">
           <Button onClick={() => confirm(step.request)}>Pay</Button>
@@ -103,7 +128,7 @@ export const Pay = ({
     <Screen onBack={onDone} title="Scan their code">
       <Camera key={attempt} onBytes={scanned} onError={setProblem} />
       {problem && <Notice tone="bad">{problem}</Notice>}
-      <p className="text-muted text-center">
+      <p className="text-center text-lg">
         Point at the code on their Receive screen.
       </p>
     </Screen>
