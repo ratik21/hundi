@@ -119,7 +119,7 @@ See [all known limits](docs/HOW-IT-WORKS.md#all-known-limits).
 
 ## Credits
 
-Built by Ratik Jindal at ETHGlobal Mumbai 2026, with Claude Code. [How it was built](docs/AI-USE.md) lists what is new, what is reused, and where AI was used, by file.
+Built at ETHGlobal Mumbai 2026, with Claude Code. See [How it was built](docs/AI-USE.md) for more info.
 
 ## License
 
