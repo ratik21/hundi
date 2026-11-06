@@ -38,16 +38,16 @@ Alice added USDT and a safety deposit while online. Now she wants a coffee from 
 2. Bob pays his supplier Carol with the same money, also offline.
 3. Carol gets signal and taps **Claim**. The USDT arrives in her account. She doesn't need gas or a seed phrase.
 
-Now Mallory pays Bob and Carol with the same money. Both phones accept it, because neither can see the other's payment while offline. When they claim, the contract finds two signatures from Mallory for the same money, which proves she cheated. Bob and Carol both get paid. Mallory's deposit loses twice the amount. Half pays the victim, and half stays locked in the contract forever.
+Now Mallory pays Bob and Carol with the same money. Both phones accept it, because neither can see the other's payment while offline. When they claim, the contract finds two signatures from Mallory for the same money, which proves the double-spend. Bob and Carol both get paid. Mallory's deposit loses twice the amount. Half pays the receiver, and half stays locked in the contract forever.
 
-Offline, nothing can prevent a double-spend. Hundi proves it afterwards and charges the cheater.
+Offline, nothing can prevent a double-spend. Hundi proves it afterwards and charges the sender.
 
 ## Transactions on Whitechain
 
 | What happened | Transaction |
 | --- | --- |
 | An iPhone in airplane mode paid a laptop by camera, then claimed through the relayer | [0x13d4...e589](https://explorer.testnet.whitechain.io/tx/0x13d45e60b0a2446c156cdda4e6e834cc39cd19bae3df4b873cd366d3aeaee589) |
-| A double-spend, paid from the cheater's deposit | [0xc2d1...8ec7](https://explorer.testnet.whitechain.io/tx/0xc2d1f8fd58de4703724456dbeeae6fb27e0166e7a8974a8d905ce4585a9c8ec7) |
+| A double-spend, paid from the sender's deposit | [0xc2d1...8ec7](https://explorer.testnet.whitechain.io/tx/0xc2d1f8fd58de4703724456dbeeae6fb27e0166e7a8974a8d905ce4585a9c8ec7) |
 | Claimed directly, with the relayer switched off | [0xaee9...bca8](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8) |
 | The relayer bought its own gas on Uniswap | [0x257e...2725](https://explorer.testnet.whitechain.io/tx/0x257e04889dbdbe086acff4953a25b8b42fdcaf5de9a97407a4f9115784982725) |
 
@@ -105,7 +105,7 @@ Censorship resistance is Hundi's main property. Payments need no server, and cla
 
 ## Limitations
 
-- Nothing offline limits how many people a cheater fools. Someone who defrauds several people before anyone claims can profit.
+- Nothing offline limits how many people receive one note. Someone who pays several people with it before anyone claims can profit.
 - A receiver refuses money added after their last sync.
 - Payments are whole 5 USDT notes, with no change.
 - There is no backup. A lost phone loses its money.

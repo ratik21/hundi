@@ -6,12 +6,12 @@ The app says **Claim** where the contract says `settle`, and shows a USDT balanc
 
 ## The protocol
 
-The rule is one signature per slot. Each holder of a note may sign exactly one message at their place in the note's history. Two different messages at one slot prove a cheat.
+The rule is one signature per slot. Each holder of a note may sign exactly one message at their place in the note's history. Two different messages at one slot prove a double-spend.
 
 1. **Online, before the outage.** A customer locks USDT in `HundiVault`, which mints notes and posts a safety deposit, called a bond in the code. Every device syncs a snapshot of notes and bonds.
 2. **Offline.** The merchant shows a request QR. The customer scans it, signs one hop to the merchant's key, and shows a payment QR. The merchant checks it against the snapshot with no network.
 3. **Offline again.** The merchant can spend the same note onward by signing the next hop.
-4. **Online, on any device.** The holder calls `settle`, which pays them. If two different messages exist at one slot, the second settlement pays the victim from the double-signer's bond and burns the same amount.
+4. **Online, on any device.** The holder calls `settle`, which pays them. If two different messages exist at one slot, the second settlement pays the receiver from the double-signer's bond and burns the same amount.
 
 ```mermaid
 flowchart LR
@@ -19,7 +19,7 @@ flowchart LR
   S -- "same note, next hop" --> P[Supplier]
   P -- settle --> V[(HundiVault)]
   C -. "double-spend: same note again" .-> S2[Second receiver]
-  S2 -- "settle: paid from the cheater's bond" --> V
+  S2 -- "settle: paid from the sender's bond" --> V
 ```
 
 Real settlements on chain 1874:
@@ -27,7 +27,7 @@ Real settlements on chain 1874:
 - [First settlement](https://explorer.testnet.whitechain.io/tx/0x4fa116315edde176eb4c8d5e0a39998f21e8791afb5bb9b2958ba3412e74ebab), 5 USDT out of the vault, signed with WebCrypto P-256 keys.
 - [Through the relayer](https://explorer.testnet.whitechain.io/tx/0x6724decba19824a653c94e8557e3d106fcc4fdf94f18ed9667825cb0c257ac66), from a device holding no gas.
 - [Direct](https://explorer.testnet.whitechain.io/tx/0xaee94522ed28b70cb12c74c9e83c9bb1fac84a3bcd83fa2c63b28ebccfbcbca8), with the relayer stopped.
-- [A double-spend claim](https://explorer.testnet.whitechain.io/tx/0xc2d1f8fd58de4703724456dbeeae6fb27e0166e7a8974a8d905ce4585a9c8ec7), paid from the cheater's bond. The bond fell from 4 to 2 USDT, and 1 USDT burned. `scripts/story-check.ts` reproduces the whole story.
+- [A double-spend claim](https://explorer.testnet.whitechain.io/tx/0xc2d1f8fd58de4703724456dbeeae6fb27e0166e7a8974a8d905ce4585a9c8ec7), paid from the sender's bond. The bond fell from 4 to 2 USDT, and 1 USDT burned. `scripts/story-check.ts` reproduces the whole story.
 
 ## Gas
 
@@ -106,12 +106,12 @@ Censorship resistance is the lead property. Offline payments need no server at a
 
 Hundi does not stop a double-spend. It makes one provable and costly.
 
-- `v` is a note's value, `B` is the cheater's bond, and `k` is how many people receive the same note. `X` is the sum of `(k - 1) * v` across their notes. The cheater's worst-case net gain is `X - B / 2`.
+- `v` is a note's value, `B` is the sender's bond, and `k` is how many people receive the same note. `X` is the sum of `(k - 1) * v` across their notes. The sender's worst-case net gain is `X - B / 2`.
 - An honest receiver can lose at most `v` per note.
-- With a bond of `2v`, a two-way fork of one note nets the cheater zero, even if they win the claim race. Each further victim adds `v` to their gain.
-- Nothing offline limits `k`. A cheater who defrauds several people in person before anyone settles can profit.
+- With a bond of `2v`, a two-way fork of one note nets the sender zero, even if they win the claim race. Each further receiver adds `v` to their gain.
+- Nothing offline limits `k`. A sender who pays several people in person with one note before anyone settles can profit.
 - A forwarder is weaker, because receivers check a bond against one note at a time. A merchant with a `2v` bond that forks `n` received notes nets `(n - 1) * v`.
-- A victim is repaid only if they claim before the bond runs out. A cheater who races their own claim can beat them.
+- A receiver is repaid only if they claim before the bond runs out. A sender who races their own claim can beat them.
 - Keys are free, so a burned key is abandoned. The bond is the only deterrent.
 - A receiver refuses a note loaded after its last sync.
 - A receiver needs no bond, but spending a note onward does.

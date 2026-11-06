@@ -22,11 +22,11 @@ Offline, nothing can stop someone spending a note twice. So I made it costly. Yo
 
 ## Why claims burn money
 
-If a claim pays out in full, a cheater can get their own deposit back through a second key, so cheating costs nothing. So a claim takes double from the cheater's deposit. Half pays the victim, and half stays locked forever.
+If a claim pays out in full, a double-spender can get their own deposit back through a second key, so a double-spend costs nothing. So a claim takes double from their deposit. Half pays the receiver, and half stays locked forever.
 
 ## What Hundi can't prevent
 
 - It can't stop a double-spend. It proves one and charges for it.
 - Someone who fools several people before anyone claims can still profit.
-- A victim only gets paid if the deposit hasn't run out.
-- Keys are free, so a cheater can start again with a new key. Losing the deposit is the only penalty.
+- A receiver only gets paid if the deposit hasn't run out.
+- Keys are free, so a double-spender can start again with a new key. Losing the deposit is the only penalty.
