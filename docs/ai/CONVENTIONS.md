@@ -285,3 +285,5 @@ const transport = http(rpcUrl, { fetchFn: (input, init) => worker.fetch(input, i
 - The default `browser-harness` connection is shared with other sessions. Set `BU_NAME=<project>`, open your own tab with `new_tab()`, and check the page URL before you navigate, type or click. Navigating with `goto_url()` on a shared connection can hijack another session's tab.
 - `https://ethglobal.com/events/mumbai/dashboard` returns 404. Use `/home`, `/team` and `/project`.
 - ethglobal.com rate-limits fast crawls with HTTP 429. Keep a 2 second gap between requests.
+- Ultracite's `useSortedKeys` reorders object literals on fix. Never call a stateful reader or any order-dependent function inside an object literal. Read into locals first.
+- Forge's local EVM has no `0x100` P-256 precompile before `osaka`, so a fork test on `prague` sees empty return data for every signature. Tests run on `osaka`. Deploy with `FOUNDRY_PROFILE=deploy`, which keeps `prague`.

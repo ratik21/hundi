@@ -6,6 +6,7 @@
       "!!contracts/lib",
       "!!contracts/out",
       "!!docs",
+      "!!.claude",
       "!!**/dist",
       "!!**/dev-dist"
     ]

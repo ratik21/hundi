@@ -6,11 +6,15 @@
       "name": "hundi",
       "devDependencies": {
         "@biomejs/biome": "2.6.4",
+        "@hundi/core": "workspace:*",
+        "@noble/curves": "2.4.0",
+        "@noble/hashes": "2.4.0",
         "@types/bun": "1.4.4",
         "@types/node": "24.19.2",
         "lefthook": "latest",
         "typescript": "7.0.2",
         "ultracite": "8.1.1",
+        "viem": "2.57.16",
       },
     },
     "apps/pwa": {

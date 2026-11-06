@@ -13,3 +13,4 @@ dev-dist/
 .DS_Store
 HANDOFF.md
 .handoffs/
+.claude/
