@@ -43,15 +43,7 @@ if [ -z "$TESTNET" ]; then
 fi
 
 if [ -n "$IOS" ]; then
-  port=5191
-  for name in "iPhone 17 Pro" "iPhone 17e" "iPhone Air"; do
-    device=$(xcrun simctl list devices available | grep -m1 "$name (" | grep -oE '[0-9A-F-]{36}')
-    xcrun simctl boot "$device" 2>/dev/null || true
-    xcrun simctl bootstatus "$device" -b >/dev/null
-    xcrun simctl openurl "$device" "http://localhost:$port/"
-    port=$((port + 1))
-  done
-  open -a Simulator
+  scripts/lab/sims.sh http://localhost:5191/ http://localhost:5192/ http://localhost:5193/
 fi
 
 echo "Customer http://localhost:5191"
