@@ -608,6 +608,8 @@ Say these plainly.
 
 Replaced by `docs/ai/VIDEO.md` for the video. This table remains the sequence `scripts/lab/drive.py` tests.
 
+The app labels **Settle** as **Claim**, and shows money as a USDT balance. "Note" stays in the contract, this plan, and one explainer in Settings.
+
 Sync all three devices first. The customer has two 5 USDT notes and a 20 USDT bond. The stall has a 10 USDT bond. The supplier has no bond.
 
 | Time | Action | Say |

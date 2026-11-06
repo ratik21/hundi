@@ -98,6 +98,8 @@ await mountHundi(document.querySelector("#till"), {
 
 The till has a merchant view and a customer view. It works in airplane mode after one online visit, and it exports a settlement CSV for the accountant. The host page must serve `packages/wallet/hundi-sw.js` from its root. `price` must equal a note's face value, because a payment carries one note and gives no change.
 
+The wallet shows money as a USDT balance, and a payment as Pending until it is claimed on-chain. The **Claim** button calls `settle`.
+
 ## How gas gets paid
 
 The payer never holds WBT or writes down a seed phrase, and no payment screen names a chain. The network shows only behind a tap, on the Wallet sheet. The relayer pays the gas and takes a 0.10 USDT fee out of the payout, so a 5 USDT note pays 4.90. Measured gas cost is about 0.044 USDT for a settle and 0.074 USDT for a load.
