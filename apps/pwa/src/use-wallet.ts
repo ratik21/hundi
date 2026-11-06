@@ -1,7 +1,7 @@
 import type { NoteRecord, Settings } from "@hundi/wallet/store";
 import { openWallet, type Wallet } from "@hundi/wallet/wallet";
 import { useCallback, useEffect, useState } from "react";
-import { createReads, RELAYER_URL, writes } from "./network";
+import { createReads, relayerUrl, writes } from "./network";
 
 export interface WalletView {
   deposit: bigint;
@@ -48,7 +48,7 @@ export const useWallet = () => {
       try {
         const opened = await openWallet({
           reads: createReads(),
-          ...(RELAYER_URL ? { relayer: RELAYER_URL } : {}),
+          relayer: relayerUrl,
           writes,
         });
         await navigator.storage?.persist?.();

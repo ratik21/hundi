@@ -5,9 +5,14 @@ const PRIMARY = import.meta.env.VITE_RPC_URL as string | undefined;
 const DEFAULT_RPC = "https://rpc.testnet.whitechain.io/";
 const BACKUP_RPC = "https://rpc.ankr.com/whitechain_testnet";
 
-export const RELAYER_URL = import.meta.env.VITE_RELAYER_URL as
-  | string
-  | undefined;
+const RELAYER_FILE = "/relayer.txt";
+
+/** Read at submit time, so a restarted tunnel needs no new build. */
+export const relayerUrl = async (): Promise<string | undefined> => {
+  const response = await fetch(RELAYER_FILE, { cache: "no-store" });
+  const url = response.ok ? (await response.text()).trim() : "";
+  return url.startsWith("https://") ? url : undefined;
+};
 
 export const writes = PRIMARY ? http(PRIMARY) : http(DEFAULT_RPC);
 

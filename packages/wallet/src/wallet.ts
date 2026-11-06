@@ -72,8 +72,12 @@ const USDT_ATOMS = 1_000_000n;
 const TRAILING_ZEROS = /0+$/u;
 const DEFAULT_LIFETIME = 86_400n;
 const AUTHORIZATION_SECONDS = 3600n;
-/** What a relayer earns for carrying a call. Direct submission pays nothing. */
-const RELAY_FEE = 20_000n as UsdtAtoms;
+/**
+ * What a relayer earns for carrying a call. A settle cost about 0.044 USDT of
+ * gas and a load 0.074, so this leaves room for a four-hop note. Direct
+ * submission pays nothing.
+ */
+const RELAY_FEE = 100_000n as UsdtAtoms;
 const NO_FEE = 0n as UsdtAtoms;
 const ZERO_SLOT = `0x${"00".repeat(32)}`;
 const SERIAL_BYTES = 16;
@@ -103,7 +107,7 @@ export interface LoadInput {
 export type SettleResult =
   | { kind: "already"; noteId: NoteId; txHash?: Hex }
   | { kind: "failed"; noteId: NoteId; reason: string }
-  /** Paid from escrow. */
+  /** Paid from escrow. `paid` is what arrived, after any relay fee. */
   | { kind: "paid"; noteId: NoteId; paid: bigint; txHash: Hex }
   /** Paid from the cheater's bond, possibly short of the note's face. */
   | { kind: "covered"; noteId: NoteId; paid: bigint; txHash: Hex };
@@ -112,7 +116,8 @@ export interface WalletOptions {
   device?: DeviceKey;
   now?: () => bigint;
   reads: PublicClient;
-  relayer?: string;
+  /** A URL, or a lookup, so a relayer can move without a new app build. */
+  relayer?: string | (() => Promise<string | undefined>);
   store?: WalletStore;
   /** Where direct submissions go. Defaults to the public RPC. */
   writes?: Transport;
@@ -166,8 +171,9 @@ export const openWallet = async (options: WalletOptions) => {
 
   const route = async (): Promise<{ fee: UsdtAtoms; submit: Submit }> => {
     const { submitDirectly } = await settings();
-    return relayer && !submitDirectly
-      ? { fee: RELAY_FEE, submit: relayerSubmit(relayer) }
+    const url = typeof relayer === "function" ? await relayer() : relayer;
+    return url && !submitDirectly
+      ? { fee: RELAY_FEE, submit: relayerSubmit(url) }
       : { fee: NO_FEE, submit: directSubmit(funding, writes) };
   };
 
@@ -417,7 +423,13 @@ export const openWallet = async (options: WalletOptions) => {
       kind: paid === note.header.face ? "settled" : "lost",
       txHash: txHash as Hex32,
     });
-    return { kind: honest ? "paid" : "covered", noteId: id, paid, txHash };
+    const received = paid > fee ? paid - fee : 0n;
+    return {
+      kind: honest ? "paid" : "covered",
+      noteId: id,
+      paid: received,
+      txHash,
+    };
   };
 
   /** Redeems every note this device received. Safe to run as often as you like. */
@@ -446,6 +458,14 @@ export const openWallet = async (options: WalletOptions) => {
     return results;
   };
 
+  /** The signed call that settles a note, for inspecting a relayer's rules. */
+  const settleCalldata = async (note: Note, fee: bigint): Promise<Hex> =>
+    encodeFunctionData({
+      abi: vaultAbi,
+      args: await settleArgs(note, await payout(), fee as UsdtAtoms),
+      functionName: "settle",
+    });
+
   /** The safety deposit this key has posted, as of the last sync. */
   const deposit = async (): Promise<bigint> =>
     (await snapshot()).bonds.get(keyId(self))?.amount ?? 0n;
@@ -472,6 +492,7 @@ export const openWallet = async (options: WalletOptions) => {
     request,
     settings,
     settle,
+    settleCalldata,
     snapshot,
     sync,
     updateSettings,

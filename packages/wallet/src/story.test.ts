@@ -1,15 +1,21 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { keyId } from "@hundi/core/bytes";
-import { sleep, spawn, which } from "bun";
+import { serve, sleep, spawn, which } from "bun";
 import {
   type Address,
   createPublicClient,
   createTestClient,
+  createWalletClient,
+  encodeFunctionData,
   erc20Abi,
   http,
   type PublicClient,
   parseEther,
+  toHex,
 } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { createHandler } from "../../../apps/relayer/src/handler";
+import { fixedWindowLimiter } from "../../../apps/relayer/src/policy";
 import { vaultAbi } from "./abi.generated";
 import { USDT, VAULT, whitechainSepolia } from "./chain-io";
 import { deviceKeyFrom, generateKeyPair } from "./keystore";
@@ -24,7 +30,6 @@ import { openWallet, usdt, type Wallet } from "./wallet";
 const PORT = 8599;
 const URL = `http://127.0.0.1:${PORT}`;
 const FORK_RPC = "https://rpc.testnet.whitechain.io/";
-const RELAYER = "0x7580eD603Ca084d4990650cdEd1990bE8bbd2694";
 const anvil = which("anvil") ?? which(`${process.env.HOME}/.foundry/bin/anvil`);
 
 let offline = false;
@@ -65,36 +70,22 @@ const bondOf = async (wallet: Wallet) => {
   return amount;
 };
 
-const newWallet = async (store = memoryStore()) =>
+const newWallet = async (store = memoryStore(), relayer?: string) =>
   openWallet({
     device: await deviceKeyFrom(await generateKeyPair()),
     reads,
+    ...(relayer ? { relayer } : {}),
     store,
     writes: transport,
   });
 
-const fund = async (wallet: Wallet, amount: bigint) => {
-  await control.setBalance({
-    address: wallet.address,
-    value: parseEther("1"),
-  });
-  await control.impersonateAccount({ address: RELAYER });
-  await control.setBalance({ address: RELAYER, value: parseEther("1") });
-  const hash = await control
-    .extend(() => ({}))
-    .request({
-      method: "eth_sendTransaction",
-      params: [
-        {
-          data: `0xa9059cbb${wallet.address.slice(2).padStart(64, "0")}${amount
-            .toString(16)
-            .padStart(64, "0")}`,
-          from: RELAYER,
-          to: USDT,
-        },
-      ],
-    } as never);
-  await reads.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+/** Mints fork-only USDT, so these tests never depend on a real balance. */
+const fund = async (wallet: Wallet, amount: bigint, gas = parseEther("1")) => {
+  await control.setBalance({ address: wallet.address, value: gas });
+  await control.request({
+    method: "anvil_dealERC20",
+    params: [wallet.address, USDT, toHex(amount)],
+  } as never);
 };
 
 describe.skipIf(!anvil)("Appendix F story", () => {
@@ -267,4 +258,140 @@ describe.skipIf(!anvil)("Appendix F story", () => {
     expect((await stall.notes())[0]?.state.kind).toBe("settled");
     expect(await stall.settle()).toEqual([]);
   }, 120_000);
+
+  describe("relayer", () => {
+    const RELAYER_PORT = 8600;
+    const RELAYER_URL = `http://127.0.0.1:${RELAYER_PORT}`;
+    const relayerAccount = privateKeyToAccount(generatePrivateKey());
+    const sent: object[] = [];
+    let relayer: ReturnType<typeof serve>;
+
+    const post = (body: unknown) =>
+      fetch(`${RELAYER_URL}/submit`, {
+        body: JSON.stringify(body),
+        method: "POST",
+      });
+
+    beforeAll(async () => {
+      await control.setBalance({
+        address: relayerAccount.address,
+        value: parseEther("1"),
+      });
+      const handle = createHandler({
+        account: relayerAccount,
+        limiter: fixedWindowLimiter(1000, 60_000),
+        log: (fields) => sent.push(fields),
+        reads,
+        wallet: createWalletClient({
+          account: relayerAccount,
+          chain: whitechainSepolia,
+          transport,
+        }),
+      });
+      relayer = serve({
+        fetch: (request) => handle(request, "test"),
+        port: RELAYER_PORT,
+      });
+    });
+
+    afterAll(() => {
+      relayer.stop(true);
+    });
+
+    test("a device with no gas loads and settles through the relayer", async () => {
+      const customer = await newWallet(memoryStore(), RELAYER_URL);
+      const stall = await newWallet(memoryStore(), RELAYER_URL);
+      await fund(customer, usdt(15.1), 0n);
+      expect(await reads.getBalance({ address: customer.address })).toBe(0n);
+      expect(await reads.getBalance({ address: stall.address })).toBe(0n);
+
+      await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+      await stall.sync();
+      const target = stall.request(usdt(5));
+      await stall.receive(await customer.pay(target), target);
+
+      const before = await usdtOf(relayerAccount.address);
+      const [report] = await stall.settle();
+
+      expect(report).toMatchObject({ kind: "paid", paid: usdt(4.9) });
+      expect(await usdtOf(stall.address)).toBe(usdt(4.9));
+      expect(await usdtOf(relayerAccount.address)).toBe(before + usdt(0.1));
+      expect(await reads.getBalance({ address: stall.address })).toBe(0n);
+    }, 120_000);
+
+    test("refuses any call but load and settle, and sends nothing", async () => {
+      const nonce = await reads.getTransactionCount({
+        address: relayerAccount.address,
+      });
+      const reclaim = encodeFunctionData({
+        abi: vaultAbi,
+        args: [`0x${"00".repeat(32)}`],
+        functionName: "reclaim",
+      });
+      expect((await post({ data: reclaim })).status).toBe(403);
+      expect((await post({ data: "0xa9059cbb" })).status).toBe(403);
+      expect((await post({ data: "nope" })).status).toBe(400);
+      expect(
+        await reads.getTransactionCount({ address: relayerAccount.address })
+      ).toBe(nonce);
+    });
+
+    test("refuses a settle that would fail, and sends nothing", async () => {
+      const customer = await newWallet();
+      const stall = await newWallet();
+      await fund(customer, usdt(15));
+      await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+      await stall.sync();
+      const target = stall.request(usdt(5));
+      const payment = await customer.pay(target);
+      const nonce = await reads.getTransactionCount({
+        address: relayerAccount.address,
+      });
+      const forged = encodeFunctionData({
+        abi: vaultAbi,
+        args: [
+          {
+            expiry: payment.header.expiry,
+            face: payment.header.face,
+            serial: payment.header.serial,
+            x: payment.header.owner.x,
+            y: payment.header.owner.y,
+          },
+          [],
+          {
+            fee: usdt(1),
+            payTo: relayerAccount.address,
+            r: `0x${"11".repeat(32)}`,
+            s: `0x${"22".repeat(32)}`,
+          },
+        ],
+        functionName: "settle",
+      });
+      const response = await post({ data: forged });
+      expect(response.status).toBe(422);
+      expect(
+        await reads.getTransactionCount({ address: relayerAccount.address })
+      ).toBe(nonce);
+    }, 120_000);
+
+    test("refuses a fee below the gas cost, and sends nothing", async () => {
+      const customer = await newWallet();
+      await fund(customer, usdt(15));
+      await customer.load({ bond: usdt(10), notes: [usdt(5)] });
+
+      // A real, valid owner settle that offers no fee, so simulation passes.
+      const [record] = await customer.notes();
+      if (record?.state.kind !== "held") {
+        throw new Error("The customer should hold the note");
+      }
+      const data = await customer.settleCalldata(record.state.note, 0n);
+      const nonce = await reads.getTransactionCount({
+        address: relayerAccount.address,
+      });
+      expect((await post({ data })).status).toBe(402);
+      expect(
+        await reads.getTransactionCount({ address: relayerAccount.address })
+      ).toBe(nonce);
+    }, 120_000);
+  });
 });
